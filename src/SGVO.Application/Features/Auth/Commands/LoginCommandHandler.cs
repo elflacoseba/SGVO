@@ -11,10 +11,12 @@ namespace SGVO.Application.Features.Auth.Commands;
 public class LoginCommandHandler : ICommandHandler<LoginCommand, LoginResponseDto>
 {
     private readonly IAuthService _authService;
+    private readonly ITokenService _tokenService;
 
-    public LoginCommandHandler(IAuthService authService)
+    public LoginCommandHandler(IAuthService authService, ITokenService tokenService)
     {
         _authService = authService;
+        _tokenService = tokenService;
     }
 
     public async Task<Result<LoginResponseDto>> Handle(
@@ -31,13 +33,11 @@ public class LoginCommandHandler : ICommandHandler<LoginCommand, LoginResponseDt
 
         var (accessToken, refreshToken) = result.Value;
 
-        // La expiración se obtiene del token decodificado; aquí usamos el valor de appsettings
-        // pero no es necesario parsear el JWT para devolver una fecha aproximada.
         var response = new LoginResponseDto
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            ExpiresAt = _tokenService.GetAccessTokenExpiration(),
             TokenType = "Bearer"
         };
 

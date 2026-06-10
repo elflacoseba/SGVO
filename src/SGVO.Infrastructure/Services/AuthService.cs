@@ -126,7 +126,7 @@ public class AuthService : IAuthService
             FechaCreacion = DateTime.UtcNow,
             FechaExpiracion = DateTime.UtcNow.AddDays(refreshDays),
             Revocado = false,
-            ReemplazadoPorId = null // El token actual se marca como usado, no reemplazado directamente
+            ReemplazadoPorId = storedToken.Id
         };
 
         _dbContext.RefreshTokens.Add(newRefreshTokenEntity);
@@ -179,7 +179,7 @@ public class AuthService : IAuthService
             .ToList();
 
         return Result<(ulong, string, string, IEnumerable<string>)>.Success(
-            (usuario.Id, usuario.NombreUsuario, string.Empty, roles));
+            (usuario.Id, usuario.NombreUsuario, usuario.Email ?? string.Empty, roles));
     }
 
     private static string GenerateRefreshToken()

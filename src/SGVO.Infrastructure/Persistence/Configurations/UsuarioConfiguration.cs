@@ -20,6 +20,10 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<UsuarioEntity>
             .HasMaxLength(100)
             .HasColumnName("Username");
 
+        builder.Property(e => e.Email)
+            .HasMaxLength(200)
+            .HasColumnName("Email");
+
         builder.Property(e => e.PasswordHash)
             .IsRequired()
             .HasMaxLength(255);

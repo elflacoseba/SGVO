@@ -15,6 +15,14 @@ public interface ITokenService
     string GenerateAccessToken(ulong userId, string username, IEnumerable<string> roles);
 
     /// <summary>
+    /// Obtiene la fecha de expiración de un token de acceso generado en este momento.
+    /// Coincide con la expiración configurada en Jwt:AccessTokenExpirationMinutes.
+    /// Usar inmediatamente después de GenerateAccessToken para obtener el ExpiresAt correcto.
+    /// </summary>
+    /// <returns>Fecha y hora de expiración en UTC.</returns>
+    DateTime GetAccessTokenExpiration();
+
+    /// <summary>
     /// Valida un token JWT y extrae el identificador del usuario si es válido.
     /// </summary>
     /// <param name="token">Token JWT a validar.</param>

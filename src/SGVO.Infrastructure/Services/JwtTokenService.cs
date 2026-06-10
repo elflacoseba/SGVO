@@ -19,6 +19,13 @@ public class JwtTokenService : ITokenService
         _configuration = configuration;
     }
 
+    private int GetExpirationMinutes()
+    {
+        if (int.TryParse(_configuration["Jwt:AccessTokenExpirationMinutes"], out var minutes))
+            return minutes;
+        return 15;
+    }
+
     public string GenerateAccessToken(ulong userId, string username, IEnumerable<string> roles)
     {
         var secret = _configuration["Jwt:Secret"]
@@ -26,9 +33,7 @@ public class JwtTokenService : ITokenService
 
         var issuer = _configuration["Jwt:Issuer"] ?? "SGVO";
         var audience = _configuration["Jwt:Audience"] ?? "SGVO-API";
-        var expirationMinutes = 15;
-        if (int.TryParse(_configuration["Jwt:AccessTokenExpirationMinutes"], out var parsedMinutes))
-            expirationMinutes = parsedMinutes;
+        var expirationMinutes = GetExpirationMinutes();
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -54,6 +59,11 @@ public class JwtTokenService : ITokenService
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public DateTime GetAccessTokenExpiration()
+    {
+        return DateTime.UtcNow.AddMinutes(GetExpirationMinutes());
     }
 
     public ulong? ValidateToken(string token)

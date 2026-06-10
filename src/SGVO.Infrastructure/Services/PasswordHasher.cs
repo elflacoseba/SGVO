@@ -1,27 +1,19 @@
-using System.Security.Cryptography;
-using System.Text;
 using SGVO.Domain.Interfaces;
 
 namespace SGVO.Infrastructure.Services;
 
 /// <summary>
-/// Servicio para hashear y verificar contraseñas usando SHA-256.
-/// Nota: Esta implementación es para desarrollo. En producción usar BCrypt o Argon2.
+/// Servicio para hashear y verificar contraseñas usando BCrypt (work factor 11).
 /// </summary>
 public class PasswordHasher : IPasswordHasher
 {
     public string HashPassword(string password)
     {
-        var bytes = Encoding.UTF8.GetBytes(password);
-        var hash = SHA256.HashData(bytes);
-        return Convert.ToHexString(hash);
+        return BCrypt.Net.BCrypt.HashPassword(password, workFactor: 11);
     }
 
     public bool VerifyPassword(string password, string hash)
     {
-        var computedHash = HashPassword(password);
-        return CryptographicOperations.FixedTimeEquals(
-            Encoding.UTF8.GetBytes(computedHash),
-            Encoding.UTF8.GetBytes(hash));
+        return BCrypt.Net.BCrypt.Verify(password, hash);
     }
 }
