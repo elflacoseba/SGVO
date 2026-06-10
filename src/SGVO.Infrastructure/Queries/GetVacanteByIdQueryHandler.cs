@@ -21,7 +21,7 @@ public sealed class GetVacanteByIdQueryHandler : IQueryHandler<GetVacanteByIdQue
     {
         var vacante = await _db.Vacantes
             .AsNoTracking()
-            .Where(v => v.Id == (ulong)query.Id)
+            .Where(v => v.Id == (ulong)query.Id && v.EliminadoEn == null && v.EliminadoPor == null)
             .Select(v => new VacanteDto
             {
                 Id = (long)v.Id,

@@ -21,6 +21,7 @@ public sealed class GetAllPostulantesQueryHandler : IQueryHandler<GetAllPostulan
     {
         var postulantes = await _db.Postulantes
             .AsNoTracking()
+            .Where(p => p.EliminadoEn == null && p.EliminadoPor == null)
             .Select(p => new PostulanteDto
             {
                 Id = (long)p.Id,

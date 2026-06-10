@@ -21,6 +21,7 @@ public sealed class GetAllCargosQueryHandler : IQueryHandler<GetAllCargosQuery, 
     {
         var cargos = await _db.Cargos
             .AsNoTracking()
+            .Where(c => c.EliminadoEn == null && c.EliminadoPor == null)
             .Select(c => new CargoDto
             {
                 Id = (long)c.Id,

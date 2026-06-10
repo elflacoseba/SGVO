@@ -21,6 +21,7 @@ public sealed class GetAllSkillsQueryHandler : IQueryHandler<GetAllSkillsQuery, 
     {
         var skills = await _db.Skills
             .AsNoTracking()
+            .Where(s => s.EliminadoEn == null && s.EliminadoPor == null)
             .Select(s => new SkillDto
             {
                 Id = (long)s.Id,
