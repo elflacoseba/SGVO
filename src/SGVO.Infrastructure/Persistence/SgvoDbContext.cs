@@ -26,6 +26,7 @@ public class SgvoDbContext : DbContext
     public DbSet<RoleEntity> Roles { get; set; }
     public DbSet<SkillEntity> Skills { get; set; }
     public DbSet<UnidadesOrganizativaEntity> UnidadesOrganizativas { get; set; }
+    public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
     public DbSet<UsuarioEntity> Usuarios { get; set; }
     public DbSet<UsuarioRoleEntity> UsuarioRoles { get; set; }
     public DbSet<VacanteEntity> Vacantes { get; set; }

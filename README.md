@@ -14,6 +14,7 @@ Proyecto .NET 10 con arquitectura limpia (Clean Architecture) para la gestión d
 | Base de datos | MySQL 9.6.0 (Pomelo.EntityFrameworkCore.MySql) |
 | Validación | FluentValidation |
 | Documentación | Swashbuckle.AspNetCore |
+| Autenticación | JWT Bearer (Microsoft.AspNetCore.Authentication.JwtBearer) |
 | Tests unitarios | xUnit + Moq + FluentAssertions |
 | Tests integración | xUnit + WebApplicationFactory + EF InMemory |
 
@@ -51,6 +52,7 @@ SGVO.sln
 src/
 ├── SGVO.Api/
 │   ├── Controllers/
+│   │   ├── AuthController.cs
 │   │   ├── HealthController.cs
 │   │   ├── VacantesController.cs
 │   │   ├── CargosController.cs
@@ -69,6 +71,18 @@ src/
 │   │   ├── ICommand.cs / ICommandHandler.cs
 │   │   └── IQuery.cs / IQueryHandler.cs
 │   ├── Features/
+│   │   ├── Auth/
+│   │   │   ├── Commands/
+│   │   │   │   ├── LoginCommand.cs
+│   │   │   │   ├── RefreshTokenCommand.cs
+│   │   │   │   └── LogoutCommand.cs
+│   │   │   ├── Dtos/
+│   │   │   │   ├── LoginRequestDto.cs
+│   │   │   │   ├── LoginResponseDto.cs
+│   │   │   │   ├── RefreshTokenRequestDto.cs
+│   │   │   │   └── UserDto.cs
+│   │   │   └── Queries/
+│   │   │       └── GetCurrentUserQuery.cs
 │   │   ├── Cargos/Queries/CargoDto.cs
 │   │   ├── Postulantes/Queries/PostulanteDto.cs
 │   │   ├── Skills/Queries/SkillDto.cs
@@ -85,8 +99,12 @@ src/
 │   │   ├── DomainEvent.cs
 │   │   └── IDomainEvent.cs
 │   ├── Interfaces/
+│   │   ├── IAuthService.cs
 │   │   ├── IDateTimeProvider.cs
+│   │   ├── IPasswordHasher.cs
+│   │   ├── IRefreshTokenRepository.cs
 │   │   ├── IRepository{T}.cs
+│   │   ├── ITokenService.cs
 │   │   └── IUnitOfWork.cs
 │   └── ValueObjects/
 │       └── ValueObject.cs
@@ -97,10 +115,15 @@ src/
 │   │   ├── SgvoDbContext.cs
 │   │   ├── Entities/
 │   │   │   ├── Vacante.cs, Cargo.cs, Postulante.cs, ...
+│   │   │   └── RefreshTokenEntity.cs
 │   │   └── Repositories/
-│   │       └── Repository{T}.cs
+│   │       ├── Repository{T}.cs
+│   │       └── RefreshTokenRepository.cs
 │   └── Services/
-│       └── DateTimeProvider.cs
+│       ├── AuthService.cs
+│       ├── DateTimeProvider.cs
+│       ├── JwtTokenService.cs
+│       └── PasswordHasher.cs
 └── SGVO.Shared/
     ├── IAssemblyMarker.cs
     ├── Result.cs
@@ -160,20 +183,74 @@ La API se expone en:
 
 ### Endpoints disponibles
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | `/api/health` | Health check |
-| GET | `/api/v1/vacantes` | Listar vacantes |
-| GET | `/api/v1/vacantes/{id}` | Obtener vacante por ID |
-| GET | `/api/v1/cargos` | Listar cargos |
-| GET | `/api/v1/postulantes` | Listar postulantes |
-| GET | `/api/v1/skills` | Listar skills |
+| Método | Endpoint | Descripción | Autenticación |
+|--------|----------|-------------|---------------|
+| POST | `/api/v1/auth/login` | Iniciar sesión | No requiere |
+| POST | `/api/v1/auth/refresh` | Refrescar token de acceso | No requiere |
+| POST | `/api/v1/auth/logout` | Cerrar sesión | Requiere |
+| GET | `/api/v1/auth/me` | Obtener usuario actual | Requiere |
+| GET | `/api/health` | Health check | No requiere |
+| GET | `/api/v1/vacantes` | Listar vacantes | Requiere |
+| GET | `/api/v1/vacantes/{id}` | Obtener vacante por ID | Requiere |
+| GET | `/api/v1/cargos` | Listar cargos | Requiere |
+| GET | `/api/v1/postulantes` | Listar postulantes | Requiere |
+| GET | `/api/v1/skills` | Listar skills | Requiere |
 
 ### Swagger
 
 En modo desarrollo, la documentación interactiva está disponible en:
 - `/swagger`
 - `/swagger/v1/swagger.json`
+
+Haz clic en **Authorize** y usa `Bearer {tu_token}` para probar endpoints protegidos.
+
+---
+
+## Cómo Autenticarse
+
+### 1. Iniciar sesión
+
+```bash
+curl -X POST https://localhost:5001/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "password"}'
+```
+
+Respuesta:
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+  "refreshToken": "dGhpcyBpcyBhIHJlZnJlc2g...",
+  "expiresAt": "2025-01-01T12:00:00Z",
+  "tokenType": "Bearer"
+}
+```
+
+### 2. Usar el token en endpoints protegidos
+
+Incluye el header en cada petición:
+
+```bash
+curl -X GET https://localhost:5001/api/v1/vacantes \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+### 3. Refrescar el token
+
+```bash
+curl -X POST https://localhost:5001/api/v1/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{"refreshToken": "dGhpcyBpcyBhIHJlZnJlc2g..."}'
+```
+
+### 4. Cerrar sesión
+
+```bash
+curl -X POST https://localhost:5001/api/v1/auth/logout \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{"refreshToken": "dGhpcyBpcyBhIHJlZnJlc2g..."}'
+```
 
 ---
 
@@ -235,7 +312,7 @@ dotnet test tests/SGVO.IntegrationTests
 - [x] Endpoints de lectura funcionales (Vacantes, Cargos, Postulantes, Skills)
 - [x] Health check y Swagger configurados
 - [x] Tests unitarios y de integración
-- [ ] Autenticación y autorización
+- [x] Autenticación y autorización (JWT Bearer)
 - [ ] Endpoints de escritura (POST, PUT, DELETE)
 - [ ] Pipeline de validación con FluentValidation
 - [ ] Interceptor de auditoría (`SaveChangesInterceptor`)

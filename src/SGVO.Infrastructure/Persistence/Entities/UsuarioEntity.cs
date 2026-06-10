@@ -10,6 +10,7 @@ public class UsuarioEntity
     public ulong Id { get; set; }
     public ulong? PersonaId { get; set; }
     public string NombreUsuario { get; set; } = null!;
+    public string? Email { get; set; }
     public string PasswordHash { get; set; } = null!;
     public bool? Activo { get; set; }
     public DateTime CreadoEn { get; set; }

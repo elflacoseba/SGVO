@@ -17,7 +17,12 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<UsuarioEntity>
 
         builder.Property(e => e.NombreUsuario)
             .IsRequired()
-            .HasMaxLength(100);
+            .HasMaxLength(100)
+            .HasColumnName("Username");
+
+        builder.Property(e => e.Email)
+            .HasMaxLength(200)
+            .HasColumnName("Email");
 
         builder.Property(e => e.PasswordHash)
             .IsRequired()
