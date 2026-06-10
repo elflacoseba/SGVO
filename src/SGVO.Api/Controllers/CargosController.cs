@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SGVO.Infrastructure.Persistence;
+using SGVO.Application.Common;
+using SGVO.Application.Features.Cargos.Queries;
 
 namespace SGVO.Api.Controllers;
 
@@ -8,27 +8,22 @@ namespace SGVO.Api.Controllers;
 [Route("api/v1/cargos")]
 public class CargosController : ControllerBase
 {
-    private readonly SgvoDbContext _db;
+    private readonly IQueryHandler<GetAllCargosQuery, IReadOnlyList<CargoDto>> _getAll;
 
-    public CargosController(SgvoDbContext db)
+    public CargosController(IQueryHandler<GetAllCargosQuery, IReadOnlyList<CargoDto>> getAll)
     {
-        _db = db;
+        _getAll = getAll;
     }
 
     [HttpGet]
     [EndpointName("GetCargos")]
     public async Task<IActionResult> GetAll(CancellationToken ct)
     {
-        var cargos = await _db.Cargos
-            .AsNoTracking()
-            .Select(c => new
-            {
-                c.Id,
-                c.Nombre,
-                c.Descripcion
-            })
-            .ToListAsync(ct);
+        var result = await _getAll.Handle(new GetAllCargosQuery(), ct);
 
-        return Ok(cargos);
+        if (result.IsFailure)
+            return StatusCode(500, new { error = result.Error });
+
+        return Ok(result.Value);
     }
 }

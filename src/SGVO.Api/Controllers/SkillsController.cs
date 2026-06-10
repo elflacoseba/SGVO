@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SGVO.Infrastructure.Persistence;
+using SGVO.Application.Common;
+using SGVO.Application.Features.Skills.Queries;
 
 namespace SGVO.Api.Controllers;
 
@@ -8,27 +8,22 @@ namespace SGVO.Api.Controllers;
 [Route("api/v1/skills")]
 public class SkillsController : ControllerBase
 {
-    private readonly SgvoDbContext _db;
+    private readonly IQueryHandler<GetAllSkillsQuery, IReadOnlyList<SkillDto>> _getAll;
 
-    public SkillsController(SgvoDbContext db)
+    public SkillsController(IQueryHandler<GetAllSkillsQuery, IReadOnlyList<SkillDto>> getAll)
     {
-        _db = db;
+        _getAll = getAll;
     }
 
     [HttpGet]
     [EndpointName("GetSkills")]
     public async Task<IActionResult> GetAll(CancellationToken ct)
     {
-        var skills = await _db.Skills
-            .AsNoTracking()
-            .Select(s => new
-            {
-                s.Id,
-                s.Nombre,
-                s.Categoria
-            })
-            .ToListAsync(ct);
+        var result = await _getAll.Handle(new GetAllSkillsQuery(), ct);
 
-        return Ok(skills);
+        if (result.IsFailure)
+            return StatusCode(500, new { error = result.Error });
+
+        return Ok(result.Value);
     }
 }

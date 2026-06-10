@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SGVO.Infrastructure.Persistence;
+using SGVO.Application.Common;
+using SGVO.Application.Features.Postulantes.Queries;
 
 namespace SGVO.Api.Controllers;
 
@@ -8,29 +8,22 @@ namespace SGVO.Api.Controllers;
 [Route("api/v1/postulantes")]
 public class PostulantesController : ControllerBase
 {
-    private readonly SgvoDbContext _db;
+    private readonly IQueryHandler<GetAllPostulantesQuery, IReadOnlyList<PostulanteDto>> _getAll;
 
-    public PostulantesController(SgvoDbContext db)
+    public PostulantesController(IQueryHandler<GetAllPostulantesQuery, IReadOnlyList<PostulanteDto>> getAll)
     {
-        _db = db;
+        _getAll = getAll;
     }
 
     [HttpGet]
     [EndpointName("GetPostulantes")]
     public async Task<IActionResult> GetAll(CancellationToken ct)
     {
-        var postulantes = await _db.Postulantes
-            .AsNoTracking()
-            .Select(p => new
-            {
-                p.Id,
-                p.Nombre,
-                p.Apellido,
-                p.Email,
-                p.Origen
-            })
-            .ToListAsync(ct);
+        var result = await _getAll.Handle(new GetAllPostulantesQuery(), ct);
 
-        return Ok(postulantes);
+        if (result.IsFailure)
+            return StatusCode(500, new { error = result.Error });
+
+        return Ok(result.Value);
     }
 }

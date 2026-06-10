@@ -2,9 +2,15 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SGVO.Application.Common;
+using SGVO.Application.Features.Cargos.Queries;
+using SGVO.Application.Features.Postulantes.Queries;
+using SGVO.Application.Features.Skills.Queries;
+using SGVO.Application.Features.Vacantes.Queries;
 using SGVO.Domain.Interfaces;
 using SGVO.Infrastructure.Persistence;
 using SGVO.Infrastructure.Persistence.Repositories;
+using SGVO.Infrastructure.Queries;
 using SGVO.Infrastructure.Services;
 
 namespace SGVO.Infrastructure.DependencyInjection;
@@ -21,6 +27,13 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<IDateTimeProvider, DateTimeProvider>();
+
+        // Query handlers
+        services.AddScoped<IQueryHandler<GetAllVacantesQuery, IReadOnlyList<VacanteDto>>, GetAllVacantesQueryHandler>();
+        services.AddScoped<IQueryHandler<GetVacanteByIdQuery, VacanteDto?>, GetVacanteByIdQueryHandler>();
+        services.AddScoped<IQueryHandler<GetAllCargosQuery, IReadOnlyList<CargoDto>>, GetAllCargosQueryHandler>();
+        services.AddScoped<IQueryHandler<GetAllPostulantesQuery, IReadOnlyList<PostulanteDto>>, GetAllPostulantesQueryHandler>();
+        services.AddScoped<IQueryHandler<GetAllSkillsQuery, IReadOnlyList<SkillDto>>, GetAllSkillsQueryHandler>();
 
         return services;
     }

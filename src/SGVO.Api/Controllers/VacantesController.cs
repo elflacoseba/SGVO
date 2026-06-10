@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SGVO.Infrastructure.Persistence;
+using SGVO.Application.Common;
+using SGVO.Application.Features.Vacantes.Queries;
 
 namespace SGVO.Api.Controllers;
 
@@ -8,51 +8,40 @@ namespace SGVO.Api.Controllers;
 [Route("api/v1/vacantes")]
 public class VacantesController : ControllerBase
 {
-    private readonly SgvoDbContext _db;
+    private readonly IQueryHandler<GetAllVacantesQuery, IReadOnlyList<VacanteDto>> _getAll;
+    private readonly IQueryHandler<GetVacanteByIdQuery, VacanteDto?> _getById;
 
-    public VacantesController(SgvoDbContext db)
+    public VacantesController(
+        IQueryHandler<GetAllVacantesQuery, IReadOnlyList<VacanteDto>> getAll,
+        IQueryHandler<GetVacanteByIdQuery, VacanteDto?> getById)
     {
-        _db = db;
+        _getAll = getAll;
+        _getById = getById;
     }
 
     [HttpGet]
     [EndpointName("GetVacantes")]
     public async Task<IActionResult> GetAll(CancellationToken ct)
     {
-        var vacantes = await _db.Vacantes
-            .AsNoTracking()
-            .Select(v => new
-            {
-                v.Id,
-                v.PuestoId,
-                v.FechaApertura,
-                v.FechaCierre,
-                v.Motivo,
-                v.Estado
-            })
-            .ToListAsync(ct);
+        var result = await _getAll.Handle(new GetAllVacantesQuery(), ct);
 
-        return Ok(vacantes);
+        if (result.IsFailure)
+            return StatusCode(500, new { error = result.Error });
+
+        return Ok(result.Value);
     }
 
     [HttpGet("{id:long}")]
     [EndpointName("GetVacanteById")]
     public async Task<IActionResult> GetById(long id, CancellationToken ct)
     {
-        var vacante = await _db.Vacantes
-            .AsNoTracking()
-            .FirstOrDefaultAsync(v => v.Id == (ulong)id, ct);
+        var result = await _getById.Handle(new GetVacanteByIdQuery(id), ct);
 
-        return vacante is null
+        if (result.IsFailure)
+            return StatusCode(500, new { error = result.Error });
+
+        return result.Value is null
             ? NotFound(new { error = $"Vacante con id {id} no encontrada." })
-            : Ok(new
-            {
-                vacante.Id,
-                vacante.PuestoId,
-                vacante.FechaApertura,
-                vacante.FechaCierre,
-                vacante.Motivo,
-                vacante.Estado
-            });
+            : Ok(result.Value);
     }
 }
