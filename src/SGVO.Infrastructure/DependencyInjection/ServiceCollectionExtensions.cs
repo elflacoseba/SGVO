@@ -3,6 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SGVO.Application.Common;
+using SGVO.Application.Features.Auth.Commands;
+using SGVO.Application.Features.Auth.Dtos;
+using SGVO.Application.Features.Auth.Queries;
+using SGVO.Shared;
 using SGVO.Application.Features.Cargos.Queries;
 using SGVO.Application.Features.Postulantes.Queries;
 using SGVO.Application.Features.Skills.Queries;
@@ -28,12 +32,24 @@ public static class ServiceCollectionExtensions
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<IDateTimeProvider, DateTimeProvider>();
 
+        // Servicios de autenticación
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<ITokenService, JwtTokenService>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
         // Query handlers
         services.AddScoped<IQueryHandler<GetAllVacantesQuery, PagedResult<VacanteDto>>, GetAllVacantesQueryHandler>();
         services.AddScoped<IQueryHandler<GetVacanteByIdQuery, VacanteDto?>, GetVacanteByIdQueryHandler>();
         services.AddScoped<IQueryHandler<GetAllCargosQuery, PagedResult<CargoDto>>, GetAllCargosQueryHandler>();
         services.AddScoped<IQueryHandler<GetAllPostulantesQuery, PagedResult<PostulanteDto>>, GetAllPostulantesQueryHandler>();
         services.AddScoped<IQueryHandler<GetAllSkillsQuery, PagedResult<SkillDto>>, GetAllSkillsQueryHandler>();
+        services.AddScoped<IQueryHandler<GetCurrentUserQuery, UserDto?>, GetCurrentUserQueryHandler>();
+
+        // Command handlers
+        services.AddScoped<ICommandHandler<LoginCommand, LoginResponseDto>, LoginCommandHandler>();
+        services.AddScoped<ICommandHandler<RefreshTokenCommand, LoginResponseDto>, RefreshTokenCommandHandler>();
+        services.AddScoped<ICommandHandler<LogoutCommand, Result>, LogoutCommandHandler>();
 
         return services;
     }

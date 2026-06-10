@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SGVO.Api.Extensions;
 using SGVO.Application.Common;
@@ -6,6 +7,7 @@ using SGVO.Application.Features.Vacantes.Queries;
 namespace SGVO.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/v1/vacantes")]
 public class VacantesController : ControllerBase
 {
