@@ -4,22 +4,16 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace SGVO.Infrastructure.Persistence.Generated.Entities;
+namespace SGVO.Infrastructure.Persistence.Entities;
 
-[Index("EliminadoPor", Name = "FK_Skills_EliminadoPor")]
-public partial class Skill
+[Index("EliminadoPor", Name = "FK_Cargos_EliminadoPor")]
+public partial class Cargo
 {
     [Key]
     public ulong Id { get; set; }
 
     [StringLength(150)]
     public string Nombre { get; set; } = null!;
-
-    /// <summary>
-    /// Técnica, Blanda, Gerencial, etc.
-    /// </summary>
-    [StringLength(100)]
-    public string? Categoria { get; set; }
 
     [StringLength(500)]
     public string? Descripcion { get; set; }
@@ -31,17 +25,20 @@ public partial class Skill
     public DateTime CreadoEn { get; set; }
 
     [Column(TypeName = "datetime")]
+    public DateTime? ModificadoEn { get; set; }
+
+    [Column(TypeName = "datetime")]
     public DateTime? EliminadoEn { get; set; }
 
     public ulong? EliminadoPor { get; set; }
 
-    [InverseProperty("Skill")]
+    [InverseProperty("Cargo")]
     public virtual ICollection<CargoSkill> CargoSkills { get; set; } = new List<CargoSkill>();
 
     [ForeignKey("EliminadoPor")]
-    [InverseProperty("Skills")]
+    [InverseProperty("Cargos")]
     public virtual Usuario? EliminadoPorNavigation { get; set; }
 
-    [InverseProperty("Skill")]
-    public virtual ICollection<PersonaSkill> PersonaSkills { get; set; } = new List<PersonaSkill>();
+    [InverseProperty("Cargo")]
+    public virtual ICollection<Puesto> Puestos { get; set; } = new List<Puesto>();
 }

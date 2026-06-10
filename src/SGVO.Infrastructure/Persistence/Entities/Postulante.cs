@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace SGVO.Infrastructure.Persistence.Generated.Entities;
+namespace SGVO.Infrastructure.Persistence.Entities;
 
 [Index("EliminadoPor", Name = "FK_Postulantes_EliminadoPor")]
 [Index("PersonaId", Name = "IX_Postulantes_PersonaId")]

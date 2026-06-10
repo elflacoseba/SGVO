@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace SGVO.Infrastructure.Persistence.Generated.Entities;
+namespace SGVO.Infrastructure.Persistence.Entities;
 
 [Index("UsuarioId", Name = "FK_Auditorias_Usuario")]
 [Index("FechaHora", Name = "IX_Auditorias_FechaHora")]

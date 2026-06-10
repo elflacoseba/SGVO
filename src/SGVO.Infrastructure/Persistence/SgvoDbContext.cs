@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using SGVO.Infrastructure.Persistence.Generated.Entities;
+using SGVO.Infrastructure.Persistence.Entities;
 
-namespace SGVO.Infrastructure.Persistence.Generated.Context;
+namespace SGVO.Infrastructure.Persistence;
 
 public partial class SgvoDbContext : DbContext
 {

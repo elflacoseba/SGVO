@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SGVO.Domain.Interfaces;
-using SGVO.Infrastructure.Persistence.Generated.Context;
+using SGVO.Infrastructure.Persistence;
 using SGVO.Infrastructure.Persistence.Repositories;
 using SGVO.Infrastructure.Services;
 

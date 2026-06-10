@@ -9,9 +9,9 @@ Proyecto .NET 10 con arquitectura limpia (Clean Architecture) para la gestión d
 | Capa | Tecnología |
 |------|-----------|
 | Framework | .NET 10 |
-| API | ASP.NET Core Web API (Minimal APIs) |
+| API | ASP.NET Core Web API (Controllers) |
 | ORM | Entity Framework Core 9 |
-| Base de datos | MySQL 8.0+ (Pomelo.EntityFrameworkCore.MySql) |
+| Base de datos | MySQL 9.6.0 (Pomelo.EntityFrameworkCore.MySql) |
 | Validación | FluentValidation |
 | Documentación | Swashbuckle.AspNetCore |
 | Tests unitarios | xUnit + Moq + FluentAssertions |
@@ -26,7 +26,7 @@ El proyecto sigue **Clean Architecture** con las siguientes capas:
 ```
 SGVO.sln
 ├── src/
-│   ├── SGVO.Api              ← Entry point (Minimal APIs, middleware, DI)
+│   ├── SGVO.Api              ← Entry point (Controllers, middleware, DI)
 │   ├── SGVO.Application      ← Casos de uso, DTOs, validadores, abstracciones
 │   ├── SGVO.Domain           ← Entidades, interfaces de dominio, eventos, value objects
 │   ├── SGVO.Infrastructure   ← EF Core, repositorios, servicios externos
@@ -50,6 +50,12 @@ SGVO.sln
 ```
 src/
 ├── SGVO.Api/
+│   ├── Controllers/
+│   │   ├── HealthController.cs
+│   │   ├── VacantesController.cs
+│   │   ├── CargosController.cs
+│   │   ├── PostulantesController.cs
+│   │   └── SkillsController.cs
 │   ├── Middleware/
 │   │   └── ExceptionHandlingMiddleware.cs
 │   ├── appsettings.json
@@ -88,11 +94,9 @@ src/
 │   ├── DependencyInjection/
 │   │   └── ServiceCollectionExtensions.cs
 │   ├── Persistence/
-│   │   ├── Generated/          ← Entidades y DbContext generados por scaffold
-│   │   │   ├── Context/
-│   │   │   │   └── SgvoDbContext.cs
-│   │   │   └── Entities/
-│   │   │       ├── Vacante.cs, Cargo.cs, Postulante.cs, ...
+│   │   ├── SgvoDbContext.cs
+│   │   ├── Entities/
+│   │   │   ├── Vacante.cs, Cargo.cs, Postulante.cs, ...
 │   │   └── Repositories/
 │   │       └── Repository{T}.cs
 │   └── Services/
@@ -125,8 +129,8 @@ Las entidades y el DbContext se regeneran mediante **scaffolding inverso**:
 dotnet ef dbcontext scaffold \
   "Server=localhost;Port=3306;Database=sgvo;Uid=root;Pwd=;" \
   Pomelo.EntityFrameworkCore.MySql \
-  --output-dir src/SGVO.Infrastructure/Persistence/Generated/Entities \
-  --context-dir src/SGVO.Infrastructure/Persistence/Generated/Context \
+  --output-dir src/SGVO.Infrastructure/Persistence/Entities \
+  --context-dir src/SGVO.Infrastructure/Persistence \
   --context SgvoDbContext \
   --data-annotations \
   --use-database-names \
@@ -135,9 +139,6 @@ dotnet ef dbcontext scaffold \
   --project src/SGVO.Infrastructure/SGVO.Infrastructure.csproj
 ```
 
-> ⚠️ **No modificar manualmente** los archivos dentro de `Persistence/Generated/`.
-> Si se necesitan ajustes, modificar la base de datos y re-ejecutar el comando.
-
 ---
 
 ## Cómo Ejecutar la API
@@ -145,7 +146,7 @@ dotnet ef dbcontext scaffold \
 ### Requisitos
 
 - .NET 10 SDK
-- MySQL 8.0+ corriendo en `localhost:3306` con la base de datos `sgvo` creada
+- MySQL 9.6.0 corriendo en `localhost:3306` con la base de datos `sgvo` creada
 
 ### Ejecutar
 
@@ -184,7 +185,7 @@ Seguir el principio de **Clean Architecture** y el flujo de dependencias:
 2. **Aplicación**: definir el comando/consulta (CQRS manual) y el DTO en `SGVO.Application`.
 3. **Validación**: agregar el validador FluentValidation en `SGVO.Application.Validators`.
 4. **Infraestructura**: si se necesita un nuevo servicio externo o repositorio especializado, implementarlo en `SGVO.Infrastructure`.
-5. **API**: exponer el endpoint en `SGVO.Api/Program.cs` o en un módulo de endpoints separado.
+5. **API**: exponer el endpoint en un controlador dentro de `SGVO.Api/Controllers`.
 
 > No usar MediatR a menos que se solicite explícitamente. Utilizar inyección directa de dependencias.
 
