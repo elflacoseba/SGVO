@@ -5,7 +5,7 @@ Sistema de Gestión de Vacantes Organizacionales. Greenfield .NET 10 project. Cu
 ## Tech Stack (Decided)
 - .NET 10
 - Entity Framework Core 9 + Pomelo.EntityFrameworkCore.MySql
-- MySQL 8.0+
+- MySQL 9.6.0
 - Clean Architecture (Domain / Application / Infrastructure / API)
 - xUnit for testing
 
@@ -63,7 +63,7 @@ When starting implementation, create:
 1. `SGVO.sln` with Clean Architecture projects
 2. `SGVO.Domain` — entities and interfaces
 3. `SGVO.Infrastructure` — EF Core DbContext, configurations, migrations
-4. `SGVO.API` — minimal API or controllers
+4. `SGVO.API` — controllers
 5. `SGVO.Tests` — xUnit project
 6. `opencode.json` if needed for workspace config
 7. `README.md` with setup instructions
