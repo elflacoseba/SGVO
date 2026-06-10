@@ -18,15 +18,16 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshTokenEn
         builder.Property(e => e.UsuarioId)
             .IsRequired();
 
+        // Use VARCHAR explicitly to avoid Pomelo auto-mapping CHAR(36) to Guid
         builder.Property(e => e.TokenHash)
             .IsRequired()
             .HasMaxLength(64)
-            .IsFixedLength();
+            .HasColumnType("varchar(64)");
 
         builder.Property(e => e.FamilyId)
             .IsRequired()
             .HasMaxLength(36)
-            .IsFixedLength();
+            .HasColumnType("varchar(36)");
 
         builder.Property(e => e.FechaCreacion)
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
