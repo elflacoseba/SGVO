@@ -13,8 +13,8 @@ public interface IAuthService
     /// <param name="username">Nombre de usuario.</param>
     /// <param name="password">Contraseña en texto plano.</param>
     /// <param name="cancellationToken">Token de cancelación.</param>
-    /// <returns>Resultado con el token de acceso y refresh token si la autenticación es exitosa.</returns>
-    Task<Result<(string AccessToken, string RefreshToken)>> LoginAsync(
+    /// <returns>Resultado con el token de acceso, refresh token y fecha de expiración si la autenticación es exitosa.</returns>
+    Task<Result<(string AccessToken, string RefreshToken, DateTime ExpiresAt)>> LoginAsync(
         string username,
         string password,
         CancellationToken cancellationToken = default);
@@ -24,8 +24,8 @@ public interface IAuthService
     /// </summary>
     /// <param name="refreshToken">Refresh token.</param>
     /// <param name="cancellationToken">Token de cancelación.</param>
-    /// <returns>Resultado con el nuevo token de acceso y refresh token.</returns>
-    Task<Result<(string AccessToken, string RefreshToken)>> RefreshTokenAsync(
+    /// <returns>Resultado con el nuevo token de acceso, refresh token y fecha de expiración.</returns>
+    Task<Result<(string AccessToken, string RefreshToken, DateTime ExpiresAt)>> RefreshTokenAsync(
         string refreshToken,
         CancellationToken cancellationToken = default);
 

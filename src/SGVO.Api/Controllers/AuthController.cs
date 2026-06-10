@@ -18,13 +18,13 @@ public class AuthController : ControllerBase
 {
     private readonly ICommandHandler<LoginCommand, LoginResponseDto> _loginHandler;
     private readonly ICommandHandler<RefreshTokenCommand, LoginResponseDto> _refreshHandler;
-    private readonly ICommandHandler<LogoutCommand, Result> _logoutHandler;
+    private readonly ICommandHandler<LogoutCommand, Unit> _logoutHandler;
     private readonly IQueryHandler<GetCurrentUserQuery, UserDto?> _currentUserHandler;
 
     public AuthController(
         ICommandHandler<LoginCommand, LoginResponseDto> loginHandler,
         ICommandHandler<RefreshTokenCommand, LoginResponseDto> refreshHandler,
-        ICommandHandler<LogoutCommand, Result> logoutHandler,
+        ICommandHandler<LogoutCommand, Unit> logoutHandler,
         IQueryHandler<GetCurrentUserQuery, UserDto?> currentUserHandler)
     {
         _loginHandler = loginHandler;
@@ -81,13 +81,11 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> Logout([FromBody] RefreshTokenRequestDto request, CancellationToken ct)
     {
-        var userIdClaim = User.FindFirst("uid")?.Value
-            ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-        if (!ulong.TryParse(userIdClaim, out var userId))
+        var userId = User.GetUserId();
+        if (!userId.HasValue)
             return Unauthorized(new { error = "No se pudo identificar al usuario." });
 
-        var command = new LogoutCommand(userId, request.RefreshToken);
+        var command = new LogoutCommand(userId.Value, request.RefreshToken);
         var result = await _logoutHandler.Handle(command, ct);
 
         if (result.IsFailure)
@@ -105,13 +103,11 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetCurrentUser(CancellationToken ct)
     {
-        var userIdClaim = User.FindFirst("uid")?.Value
-            ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-        if (!ulong.TryParse(userIdClaim, out var userId))
+        var userId = User.GetUserId();
+        if (!userId.HasValue)
             return Unauthorized(new { error = "No se pudo identificar al usuario." });
 
-        var query = new GetCurrentUserQuery(userId);
+        var query = new GetCurrentUserQuery(userId.Value);
         var result = await _currentUserHandler.Handle(query, ct);
 
         if (result.IsFailure)

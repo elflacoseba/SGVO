@@ -31,7 +31,7 @@ public class AuthService : IAuthService
         _configuration = configuration;
     }
 
-    public async Task<Result<(string AccessToken, string RefreshToken)>> LoginAsync(
+    public async Task<Result<(string AccessToken, string RefreshToken, DateTime ExpiresAt)>> LoginAsync(
         string username,
         string password,
         CancellationToken cancellationToken = default)
@@ -44,17 +44,17 @@ public class AuthService : IAuthService
                 cancellationToken);
 
         if (usuario is null)
-            return Result<(string, string)>.Failure("Credenciales inválidas.", "UNAUTHORIZED");
+            return Result<(string, string, DateTime)>.Failure("Credenciales inválidas.", "UNAUTHORIZED");
 
         if (!_passwordHasher.VerifyPassword(password, usuario.PasswordHash))
-            return Result<(string, string)>.Failure("Credenciales inválidas.", "UNAUTHORIZED");
+            return Result<(string, string, DateTime)>.Failure("Credenciales inválidas.", "UNAUTHORIZED");
 
         var roles = usuario.Roles
             .Where(r => r.Activo == true)
             .Select(r => r.Nombre)
             .ToList();
 
-        var accessToken = _tokenService.GenerateAccessToken(usuario.Id, usuario.NombreUsuario, roles);
+        var (accessToken, expiresAt) = _tokenService.GenerateAccessToken(usuario.Id, usuario.NombreUsuario, roles);
         var refreshToken = GenerateRefreshToken();
         var familyId = Guid.NewGuid().ToString();
         var refreshDays = 7;
@@ -74,10 +74,10 @@ public class AuthService : IAuthService
         _dbContext.RefreshTokens.Add(refreshTokenEntity);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result<(string, string)>.Success((accessToken, refreshToken));
+        return Result<(string, string, DateTime)>.Success((accessToken, refreshToken, expiresAt));
     }
 
-    public async Task<Result<(string AccessToken, string RefreshToken)>> RefreshTokenAsync(
+    public async Task<Result<(string AccessToken, string RefreshToken, DateTime ExpiresAt)>> RefreshTokenAsync(
         string refreshToken,
         CancellationToken cancellationToken = default)
     {
@@ -91,16 +91,16 @@ public class AuthService : IAuthService
                 cancellationToken);
 
         if (storedToken is null)
-            return Result<(string, string)>.Failure("Refresh token inválido.", "UNAUTHORIZED");
+            return Result<(string, string, DateTime)>.Failure("Refresh token inválido.", "UNAUTHORIZED");
 
         if (storedToken.FechaExpiracion < DateTime.UtcNow)
-            return Result<(string, string)>.Failure("Refresh token expirado.", "UNAUTHORIZED");
+            return Result<(string, string, DateTime)>.Failure("Refresh token expirado.", "UNAUTHORIZED");
 
         if (storedToken.FechaUso.HasValue)
         {
             // Reutilización detectada: revocar toda la familia
             await RevokeFamilyAsync(storedToken.FamilyId, "Reutilización detectada", cancellationToken);
-            return Result<(string, string)>.Failure("Refresh token reutilizado. Revocado por seguridad.", "UNAUTHORIZED");
+            return Result<(string, string, DateTime)>.Failure("Refresh token reutilizado. Revocado por seguridad.", "UNAUTHORIZED");
         }
 
         // Marcar el token actual como usado
@@ -112,7 +112,7 @@ public class AuthService : IAuthService
             .Select(r => r.Nombre)
             .ToList();
 
-        var newAccessToken = _tokenService.GenerateAccessToken(usuario.Id, usuario.NombreUsuario, roles);
+        var (newAccessToken, expiresAt) = _tokenService.GenerateAccessToken(usuario.Id, usuario.NombreUsuario, roles);
         var newRefreshToken = GenerateRefreshToken();
         var refreshDays = 7;
         if (int.TryParse(_configuration["Jwt:RefreshTokenExpirationDays"], out var parsedDays))
@@ -132,7 +132,7 @@ public class AuthService : IAuthService
         _dbContext.RefreshTokens.Add(newRefreshTokenEntity);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result<(string, string)>.Success((newAccessToken, newRefreshToken));
+        return Result<(string, string, DateTime)>.Success((newAccessToken, newRefreshToken, expiresAt));
     }
 
     public async Task<Result> LogoutAsync(

@@ -1,3 +1,5 @@
+using SGVO.Domain.Entities;
+
 namespace SGVO.Domain.Interfaces;
 
 /// <summary>
@@ -12,7 +14,7 @@ public interface IRefreshTokenRepository
     /// <param name="cancellationToken">Token de cancelación.</param>
     /// <returns>Tarea completada.</returns>
     Task CreateAsync(
-        object token,
+        RefreshToken token,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -21,7 +23,7 @@ public interface IRefreshTokenRepository
     /// <param name="hash">Hash del token.</param>
     /// <param name="cancellationToken">Token de cancelación.</param>
     /// <returns>Entidad del refresh token si existe; null en caso contrario.</returns>
-    Task<object?> GetByTokenHashAsync(
+    Task<RefreshToken?> GetByTokenHashAsync(
         string hash,
         CancellationToken cancellationToken = default);
 
@@ -55,7 +57,7 @@ public interface IRefreshTokenRepository
     /// <param name="userId">Identificador del usuario.</param>
     /// <param name="cancellationToken">Token de cancelación.</param>
     /// <returns>Lista de refresh tokens activos.</returns>
-    Task<IReadOnlyList<object>> GetActiveByUserIdAsync(
+    Task<IReadOnlyList<RefreshToken>> GetActiveByUserIdAsync(
         ulong userId,
         CancellationToken cancellationToken = default);
 }

@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using SGVO.Domain.Interfaces;
 
@@ -13,10 +14,12 @@ namespace SGVO.Infrastructure.Services;
 public class JwtTokenService : ITokenService
 {
     private readonly IConfiguration _configuration;
+    private readonly ILogger<JwtTokenService> _logger;
 
-    public JwtTokenService(IConfiguration configuration)
+    public JwtTokenService(IConfiguration configuration, ILogger<JwtTokenService> logger)
     {
         _configuration = configuration;
+        _logger = logger;
     }
 
     private int GetExpirationMinutes()
@@ -26,7 +29,10 @@ public class JwtTokenService : ITokenService
         return 15;
     }
 
-    public string GenerateAccessToken(ulong userId, string username, IEnumerable<string> roles)
+    public (string Token, DateTime ExpiresAt) GenerateAccessToken(
+        ulong userId,
+        string username,
+        IEnumerable<string> roles)
     {
         var secret = _configuration["Jwt:Secret"]
             ?? throw new InvalidOperationException("JWT Secret no está configurado.");
@@ -34,6 +40,7 @@ public class JwtTokenService : ITokenService
         var issuer = _configuration["Jwt:Issuer"] ?? "SGVO";
         var audience = _configuration["Jwt:Audience"] ?? "SGVO-API";
         var expirationMinutes = GetExpirationMinutes();
+        var expiresAt = DateTime.UtcNow.AddMinutes(expirationMinutes);
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -55,15 +62,10 @@ public class JwtTokenService : ITokenService
             issuer: issuer,
             audience: audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(expirationMinutes),
+            expires: expiresAt,
             signingCredentials: credentials);
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
-
-    public DateTime GetAccessTokenExpiration()
-    {
-        return DateTime.UtcNow.AddMinutes(GetExpirationMinutes());
+        return (new JwtSecurityTokenHandler().WriteToken(token), expiresAt);
     }
 
     public ulong? ValidateToken(string token)
@@ -89,7 +91,7 @@ public class JwtTokenService : ITokenService
                 ValidateAudience = true,
                 ValidAudience = audience,
                 ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
+                ClockSkew = TimeSpan.FromMinutes(2)
             }, out _);
 
             var userIdClaim = principal.FindFirst("uid")?.Value
@@ -100,8 +102,24 @@ public class JwtTokenService : ITokenService
 
             return null;
         }
-        catch
+        catch (SecurityTokenExpiredException ex)
         {
+            _logger.LogDebug(ex, "Token validation failed: token expired");
+            return null;
+        }
+        catch (SecurityTokenInvalidSignatureException ex)
+        {
+            _logger.LogDebug(ex, "Token validation failed: invalid signature");
+            return null;
+        }
+        catch (SecurityTokenException ex)
+        {
+            _logger.LogDebug(ex, "Token validation failed: {Message}", ex.Message);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Token validation failed with unexpected error");
             return null;
         }
     }

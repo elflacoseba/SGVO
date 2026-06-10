@@ -49,7 +49,7 @@ public static class ServiceCollectionExtensions
         // Command handlers
         services.AddScoped<ICommandHandler<LoginCommand, LoginResponseDto>, LoginCommandHandler>();
         services.AddScoped<ICommandHandler<RefreshTokenCommand, LoginResponseDto>, RefreshTokenCommandHandler>();
-        services.AddScoped<ICommandHandler<LogoutCommand, Result>, LogoutCommandHandler>();
+        services.AddScoped<ICommandHandler<LogoutCommand, Unit>, LogoutCommandHandler>();
 
         return services;
     }

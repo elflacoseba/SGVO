@@ -7,7 +7,7 @@ namespace SGVO.Application.Features.Auth.Commands;
 /// <summary>
 /// Handler para procesar el comando de cierre de sesión.
 /// </summary>
-public class LogoutCommandHandler : ICommandHandler<LogoutCommand, Result>
+public class LogoutCommandHandler : ICommandHandler<LogoutCommand, Unit>
 {
     private readonly IAuthService _authService;
 
@@ -16,7 +16,7 @@ public class LogoutCommandHandler : ICommandHandler<LogoutCommand, Result>
         _authService = authService;
     }
 
-    public async Task<Result<Result>> Handle(
+    public async Task<Result<Unit>> Handle(
         LogoutCommand command,
         CancellationToken cancellationToken)
     {
@@ -26,8 +26,8 @@ public class LogoutCommandHandler : ICommandHandler<LogoutCommand, Result>
             cancellationToken);
 
         if (result.IsFailure)
-            return Result<Result>.Failure(result.Error!, result.ErrorCode);
+            return Result<Unit>.Failure(result.Error!, result.ErrorCode);
 
-        return Result<Result>.Success(Result.Success());
+        return Result<Unit>.Success(Unit.Value);
     }
 }
