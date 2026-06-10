@@ -1,0 +1,6 @@
+@SGVO.Api_HostAddress = http://localhost:5201
+
+GET {{SGVO.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

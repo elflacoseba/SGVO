@@ -1,0 +1,122 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+**/[Bb]in/
+**/[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+build/
+[Bb]uild/
+
+# VS Code
+.vscode/
+
+# Visual Studio
+.vs/
+*.vcxproj.user
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+*.cache
+*.dbmdl
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+*.vspscc
+*.vssscc
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# Rider
+.idea/
+*.sln.iml
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+.nuget/packages/
+
+# Build artifacts
+*.log
+*.tlog/
+*.lastbuildstate
+*.tmp
+*.temp
+*.tmp_proj
+*.log
+*.vsmdi
+*.cache
+*.pdb
+*.ipdb
+*.obj
+*.iobj
+*.cachefile
+*.ilk
+*.meta
+*.exp
+*.appxupload
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+
+# IIS Express
+/.vs/**/applicationhost.config
+/.vs/**/config/
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Rider caches
+.idea/
+*.sln.iml
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Azure DevOps
+.vs/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# OpenCode
+.opencode/sessions/
+.opencode/cache/
+.opencode/tmp/
+.opencode/logs/
+
+# Engram
+.engram/cache/
+.engram/logs/
+.engram/tmp/
+
+# Secrets
+appsettings.Development.json
+appsettings.Local.json
+.env
+.env.*
+secrets.json

@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SGVO.Api/SGVO.Api.csproj" />
+    <Project Path="src/SGVO.Application/SGVO.Application.csproj" />
+    <Project Path="src/SGVO.Domain/SGVO.Domain.csproj" />
+    <Project Path="src/SGVO.Infrastructure/SGVO.Infrastructure.csproj" />
+    <Project Path="src/SGVO.Shared/SGVO.Shared.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SGVO.IntegrationTests/SGVO.IntegrationTests.csproj" />
+    <Project Path="tests/SGVO.UnitTests/SGVO.UnitTests.csproj" />
+  </Folder>
+</Solution>

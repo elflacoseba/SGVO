@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <UserSecretsId>212759ea-586d-4265-839a-ba7b9b6ce0f4</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SGVO.Application\SGVO.Application.csproj" />
+    <ProjectReference Include="..\SGVO.Infrastructure\SGVO.Infrastructure.csproj" />
+    <ProjectReference Include="..\SGVO.Shared\SGVO.Shared.csproj" />
+  </ItemGroup>
+
+</Project>
