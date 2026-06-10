@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SGVO.Api.Extensions;
 using SGVO.Application.Common;
 using SGVO.Application.Features.Vacantes.Queries;
 
@@ -26,7 +27,7 @@ public class VacantesController : ControllerBase
         var result = await _getAll.Handle(new GetAllVacantesQuery(), ct);
 
         if (result.IsFailure)
-            return StatusCode(500, new { error = result.Error });
+            return result.ToErrorActionResult();
 
         return Ok(result.Value);
     }
@@ -38,7 +39,7 @@ public class VacantesController : ControllerBase
         var result = await _getById.Handle(new GetVacanteByIdQuery(id), ct);
 
         if (result.IsFailure)
-            return StatusCode(500, new { error = result.Error });
+            return result.ToErrorActionResult();
 
         return result.Value is null
             ? NotFound(new { error = $"Vacante con id {id} no encontrada." })

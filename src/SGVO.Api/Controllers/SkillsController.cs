@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SGVO.Api.Extensions;
 using SGVO.Application.Common;
 using SGVO.Application.Features.Skills.Queries;
 
@@ -22,7 +23,7 @@ public class SkillsController : ControllerBase
         var result = await _getAll.Handle(new GetAllSkillsQuery(), ct);
 
         if (result.IsFailure)
-            return StatusCode(500, new { error = result.Error });
+            return result.ToErrorActionResult();
 
         return Ok(result.Value);
     }
