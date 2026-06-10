@@ -6,32 +6,35 @@ using SGVO.Shared;
 
 namespace SGVO.Infrastructure.Queries;
 
-public sealed class GetAllVacantesQueryHandler : IQueryHandler<GetAllVacantesQuery, PagedResult<VacanteDto>>
+/// <summary>
+/// Handler para GetAllVacantesQuery. Retorna vacantes paginadas excluyendo soft-deleted.
+/// </summary>
+public class GetAllVacantesQueryHandler : IQueryHandler<GetAllVacantesQuery, PagedResult<VacanteDto>>
 {
-    private readonly SgvoDbContext _db;
+    private readonly SgvoDbContext _dbContext;
 
-    public GetAllVacantesQueryHandler(SgvoDbContext db)
+    public GetAllVacantesQueryHandler(SgvoDbContext dbContext)
     {
-        _db = db;
+        _dbContext = dbContext;
     }
 
     public async Task<Result<PagedResult<VacanteDto>>> Handle(
-        GetAllVacantesQuery query,
-        CancellationToken cancellationToken = default)
+        GetAllVacantesQuery request,
+        CancellationToken cancellationToken)
     {
-        var page = query.Pagination.Normalize();
+        var normalized = request.Pagination.Normalize();
 
-        var filtered = _db.Vacantes
+        var query = _dbContext.Vacantes
             .AsNoTracking()
             .Where(v => v.EliminadoEn == null && v.EliminadoPor == null);
 
-        var totalCount = await filtered.CountAsync(cancellationToken);
-        var totalPages = (int)Math.Ceiling(totalCount / (double)page.PageSize);
+        var totalCount = await query.CountAsync(cancellationToken);
+        var totalPages = (int)Math.Ceiling(totalCount / (double)normalized.PageSize);
 
-        var vacantes = await filtered
+        var vacantes = await query
             .OrderBy(v => v.Id)
-            .Skip(page.SkipCount)
-            .Take(page.PageSize)
+            .Skip(normalized.SkipCount)
+            .Take(normalized.PageSize)
             .Select(v => new VacanteDto
             {
                 Id = (long)v.Id,
@@ -43,7 +46,7 @@ public sealed class GetAllVacantesQueryHandler : IQueryHandler<GetAllVacantesQue
             })
             .ToListAsync(cancellationToken);
 
-        return Result<PagedResult<VacanteDto>>.Success(
-            new PagedResult<VacanteDto>(vacantes, totalCount, page.Page, page.PageSize, totalPages));
+        var result = new PagedResult<VacanteDto>(vacantes, totalCount, normalized.Page, normalized.PageSize, totalPages);
+        return Result<PagedResult<VacanteDto>>.Success(result);
     }
 }

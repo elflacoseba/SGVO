@@ -6,32 +6,35 @@ using SGVO.Shared;
 
 namespace SGVO.Infrastructure.Queries;
 
-public sealed class GetAllPostulantesQueryHandler : IQueryHandler<GetAllPostulantesQuery, PagedResult<PostulanteDto>>
+/// <summary>
+/// Handler para GetAllPostulantesQuery. Retorna postulantes paginados excluyendo soft-deleted.
+/// </summary>
+public class GetAllPostulantesQueryHandler : IQueryHandler<GetAllPostulantesQuery, PagedResult<PostulanteDto>>
 {
-    private readonly SgvoDbContext _db;
+    private readonly SgvoDbContext _dbContext;
 
-    public GetAllPostulantesQueryHandler(SgvoDbContext db)
+    public GetAllPostulantesQueryHandler(SgvoDbContext dbContext)
     {
-        _db = db;
+        _dbContext = dbContext;
     }
 
     public async Task<Result<PagedResult<PostulanteDto>>> Handle(
-        GetAllPostulantesQuery query,
-        CancellationToken cancellationToken = default)
+        GetAllPostulantesQuery request,
+        CancellationToken cancellationToken)
     {
-        var page = query.Pagination.Normalize();
+        var normalized = request.Pagination.Normalize();
 
-        var filtered = _db.Postulantes
+        var query = _dbContext.Postulantes
             .AsNoTracking()
             .Where(p => p.EliminadoEn == null && p.EliminadoPor == null);
 
-        var totalCount = await filtered.CountAsync(cancellationToken);
-        var totalPages = (int)Math.Ceiling(totalCount / (double)page.PageSize);
+        var totalCount = await query.CountAsync(cancellationToken);
+        var totalPages = (int)Math.Ceiling(totalCount / (double)normalized.PageSize);
 
-        var postulantes = await filtered
+        var postulantes = await query
             .OrderBy(p => p.Id)
-            .Skip(page.SkipCount)
-            .Take(page.PageSize)
+            .Skip(normalized.SkipCount)
+            .Take(normalized.PageSize)
             .Select(p => new PostulanteDto
             {
                 Id = (long)p.Id,
@@ -42,7 +45,7 @@ public sealed class GetAllPostulantesQueryHandler : IQueryHandler<GetAllPostulan
             })
             .ToListAsync(cancellationToken);
 
-        return Result<PagedResult<PostulanteDto>>.Success(
-            new PagedResult<PostulanteDto>(postulantes, totalCount, page.Page, page.PageSize, totalPages));
+        var result = new PagedResult<PostulanteDto>(postulantes, totalCount, normalized.Page, normalized.PageSize, totalPages);
+        return Result<PagedResult<PostulanteDto>>.Success(result);
     }
 }

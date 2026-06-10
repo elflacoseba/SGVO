@@ -6,32 +6,35 @@ using SGVO.Shared;
 
 namespace SGVO.Infrastructure.Queries;
 
-public sealed class GetAllSkillsQueryHandler : IQueryHandler<GetAllSkillsQuery, PagedResult<SkillDto>>
+/// <summary>
+/// Handler para GetAllSkillsQuery. Retorna skills paginados excluyendo soft-deleted.
+/// </summary>
+public class GetAllSkillsQueryHandler : IQueryHandler<GetAllSkillsQuery, PagedResult<SkillDto>>
 {
-    private readonly SgvoDbContext _db;
+    private readonly SgvoDbContext _dbContext;
 
-    public GetAllSkillsQueryHandler(SgvoDbContext db)
+    public GetAllSkillsQueryHandler(SgvoDbContext dbContext)
     {
-        _db = db;
+        _dbContext = dbContext;
     }
 
     public async Task<Result<PagedResult<SkillDto>>> Handle(
-        GetAllSkillsQuery query,
-        CancellationToken cancellationToken = default)
+        GetAllSkillsQuery request,
+        CancellationToken cancellationToken)
     {
-        var page = query.Pagination.Normalize();
+        var normalized = request.Pagination.Normalize();
 
-        var filtered = _db.Skills
+        var query = _dbContext.Skills
             .AsNoTracking()
             .Where(s => s.EliminadoEn == null && s.EliminadoPor == null);
 
-        var totalCount = await filtered.CountAsync(cancellationToken);
-        var totalPages = (int)Math.Ceiling(totalCount / (double)page.PageSize);
+        var totalCount = await query.CountAsync(cancellationToken);
+        var totalPages = (int)Math.Ceiling(totalCount / (double)normalized.PageSize);
 
-        var skills = await filtered
+        var skills = await query
             .OrderBy(s => s.Id)
-            .Skip(page.SkipCount)
-            .Take(page.PageSize)
+            .Skip(normalized.SkipCount)
+            .Take(normalized.PageSize)
             .Select(s => new SkillDto
             {
                 Id = (long)s.Id,
@@ -40,7 +43,7 @@ public sealed class GetAllSkillsQueryHandler : IQueryHandler<GetAllSkillsQuery, 
             })
             .ToListAsync(cancellationToken);
 
-        return Result<PagedResult<SkillDto>>.Success(
-            new PagedResult<SkillDto>(skills, totalCount, page.Page, page.PageSize, totalPages));
+        var result = new PagedResult<SkillDto>(skills, totalCount, normalized.Page, normalized.PageSize, totalPages);
+        return Result<PagedResult<SkillDto>>.Success(result);
     }
 }

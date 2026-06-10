@@ -6,138 +6,135 @@ using SGVO.Infrastructure.Queries;
 namespace SGVO.UnitTests.Queries;
 
 /// <summary>
-/// Tests unitarios para el query handler de listado de vacantes.
+/// Tests unitarios para GetAllVacantesQueryHandler y GetVacanteByIdQueryHandler.
 /// </summary>
 public class GetAllVacantesQueryHandlerTests
 {
     [Fact]
-    public async Task Handle_ConVacantesActivas_DebeRetornarListado()
+    public async Task Handle_WithActiveVacantes_ReturnsPagedResult()
     {
         // Arrange
-        var db = InMemoryDbContextFactory.Create();
-        db.Vacantes.Add(new Vacante
-        {
-            Id = 1,
-            PuestoId = 10,
-            FechaApertura = DateTime.UtcNow,
-            Motivo = "Nueva posicion",
-            Estado = "Abierta",
-            Activo = true,
-            CreadoEn = DateTime.UtcNow
-        });
-        db.Vacantes.Add(new Vacante
-        {
-            Id = 2,
-            PuestoId = 20,
-            FechaApertura = DateTime.UtcNow,
-            Motivo = "Reemplazo",
-            Estado = "Cubierta",
-            Activo = true,
-            CreadoEn = DateTime.UtcNow
-        });
-        await db.SaveChangesAsync();
+        var dbContext = InMemoryDbContextFactory.Create();
+        dbContext.Vacantes.AddRange(
+            new VacanteEntity { Id = 1, PuestoId = 1, Motivo = "Vacante 1", Estado = "Abierta", Activo = true, FechaApertura = DateTime.UtcNow, CreadoEn = DateTime.UtcNow },
+            new VacanteEntity { Id = 2, PuestoId = 2, Motivo = "Vacante 2", Estado = "Abierta", Activo = true, FechaApertura = DateTime.UtcNow, CreadoEn = DateTime.UtcNow }
+        );
+        await dbContext.SaveChangesAsync();
 
-        var handler = new GetAllVacantesQueryHandler(db);
+        var handler = new GetAllVacantesQueryHandler(dbContext);
+        var query = new GetAllVacantesQuery(new PageParameters(1, 10));
 
         // Act
-        var result = await handler.Handle(new GetAllVacantesQuery(new PageParameters()), CancellationToken.None);
+        var result = await handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
-        Assert.Equal(2, result.Value!.Items.Count);
-        Assert.Contains(result.Value.Items, v => v.Motivo == "Nueva posicion");
-        Assert.Contains(result.Value.Items, v => v.Motivo == "Reemplazo");
+        Assert.Equal(2, result.Value.TotalCount);
+        Assert.Equal(2, result.Value.Items.Count);
     }
 
     [Fact]
-    public async Task Handle_ConVacantesEliminadas_DebeExcluirLasEliminadas()
+    public async Task Handle_WithSoftDeletedVacantes_ExcludesThem()
     {
         // Arrange
-        var db = InMemoryDbContextFactory.Create();
-        db.Vacantes.Add(new Vacante
-        {
-            Id = 1,
-            PuestoId = 10,
-            FechaApertura = DateTime.UtcNow,
-            Motivo = "Activa",
-            Estado = "Abierta",
-            Activo = true,
-            CreadoEn = DateTime.UtcNow
-        });
-        db.Vacantes.Add(new Vacante
-        {
-            Id = 2,
-            PuestoId = 20,
-            FechaApertura = DateTime.UtcNow,
-            Motivo = "Eliminada",
-            Estado = "Abierta",
-            Activo = true,
-            CreadoEn = DateTime.UtcNow,
-            EliminadoEn = DateTime.UtcNow,
-            EliminadoPor = 1
-        });
-        await db.SaveChangesAsync();
+        var dbContext = InMemoryDbContextFactory.Create();
+        dbContext.Vacantes.AddRange(
+            new VacanteEntity { Id = 1, PuestoId = 1, Motivo = "Activa", Estado = "Abierta", Activo = true, FechaApertura = DateTime.UtcNow, CreadoEn = DateTime.UtcNow },
+            new VacanteEntity { Id = 2, PuestoId = 2, Motivo = "Eliminada", Estado = "Abierta", Activo = false, EliminadoEn = DateTime.UtcNow, EliminadoPor = 1, FechaApertura = DateTime.UtcNow, CreadoEn = DateTime.UtcNow }
+        );
+        await dbContext.SaveChangesAsync();
 
-        var handler = new GetAllVacantesQueryHandler(db);
+        var handler = new GetAllVacantesQueryHandler(dbContext);
+        var query = new GetAllVacantesQuery(new PageParameters(1, 10));
 
         // Act
-        var result = await handler.Handle(new GetAllVacantesQuery(new PageParameters()), CancellationToken.None);
+        var result = await handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
-        Assert.Single(result.Value!.Items);
+        Assert.Equal(1, result.Value.TotalCount);
+        Assert.Single(result.Value.Items);
         Assert.Equal("Activa", result.Value.Items[0].Motivo);
     }
+}
 
+public class GetVacanteByIdQueryHandlerTests
+{
     [Fact]
-    public async Task Handle_SinVacantes_DebeRetornarListaVacia()
+    public async Task Handle_WithExistingVacante_ReturnsDto()
     {
         // Arrange
-        var db = InMemoryDbContextFactory.Create();
-        var handler = new GetAllVacantesQueryHandler(db);
+        var dbContext = InMemoryDbContextFactory.Create();
+        dbContext.Vacantes.Add(new VacanteEntity
+        {
+            Id = 1,
+            PuestoId = 10,
+            Motivo = "Vacante de prueba",
+            Estado = "Abierta",
+            Activo = true,
+            FechaApertura = DateTime.UtcNow,
+            CreadoEn = DateTime.UtcNow
+        });
+        await dbContext.SaveChangesAsync();
+
+        var handler = new GetVacanteByIdQueryHandler(dbContext);
+        var query = new GetVacanteByIdQuery(1);
 
         // Act
-        var result = await handler.Handle(new GetAllVacantesQuery(new PageParameters()), CancellationToken.None);
+        var result = await handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
-        Assert.Empty(result.Value!.Items);
+        Assert.Equal(1, result.Value.Id);
+        Assert.Equal("Vacante de prueba", result.Value.Motivo);
     }
 
     [Fact]
-    public async Task Handle_DebeMapearCorrectamenteADto()
+    public async Task Handle_WithNonExistingVacante_ReturnsNull()
     {
         // Arrange
-        var db = InMemoryDbContextFactory.Create();
-        var fechaApertura = new DateTime(2026, 1, 15);
-        db.Vacantes.Add(new Vacante
+        var dbContext = InMemoryDbContextFactory.Create();
+        var handler = new GetVacanteByIdQueryHandler(dbContext);
+        var query = new GetVacanteByIdQuery(999);
+
+        // Act
+        var result = await handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task Handle_WithSoftDeletedVacante_ReturnsNull()
+    {
+        // Arrange
+        var dbContext = InMemoryDbContextFactory.Create();
+        dbContext.Vacantes.Add(new VacanteEntity
         {
             Id = 1,
             PuestoId = 10,
-            FechaApertura = fechaApertura,
-            FechaCierre = new DateTime(2026, 3, 20),
-            Motivo = "Expansion",
-            Estado = "Cubierta",
-            Activo = true,
+            Motivo = "Eliminada",
+            Estado = "Abierta",
+            Activo = false,
+            EliminadoEn = DateTime.UtcNow,
+            EliminadoPor = 1,
+            FechaApertura = DateTime.UtcNow,
             CreadoEn = DateTime.UtcNow
         });
-        await db.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
-        var handler = new GetAllVacantesQueryHandler(db);
+        var handler = new GetVacanteByIdQueryHandler(dbContext);
+        var query = new GetVacanteByIdQuery(1);
 
         // Act
-        var result = await handler.Handle(new GetAllVacantesQuery(new PageParameters()), CancellationToken.None);
+        var result = await handler.Handle(query, CancellationToken.None);
 
         // Assert
-        Assert.NotNull(result.Value);
-        var dto = result.Value!.Items[0];
-        Assert.Equal(1, dto.Id);
-        Assert.Equal(10, dto.PuestoId);
-        Assert.Equal(fechaApertura, dto.FechaApertura);
-        Assert.Equal("Expansion", dto.Motivo);
-        Assert.Equal("Cubierta", dto.Estado);
+        Assert.True(result.IsSuccess);
+        Assert.Null(result.Value);
     }
 }

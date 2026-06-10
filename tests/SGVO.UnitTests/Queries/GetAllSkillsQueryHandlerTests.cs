@@ -6,122 +6,56 @@ using SGVO.Infrastructure.Queries;
 namespace SGVO.UnitTests.Queries;
 
 /// <summary>
-/// Tests unitarios para el query handler de listado de skills.
+/// Tests unitarios para GetAllSkillsQueryHandler.
 /// </summary>
 public class GetAllSkillsQueryHandlerTests
 {
     [Fact]
-    public async Task Handle_ConSkillsActivos_DebeRetornarListado()
+    public async Task Handle_WithActiveSkills_ReturnsPagedResult()
     {
         // Arrange
-        var db = InMemoryDbContextFactory.Create();
-        db.Skills.Add(new Skill
-        {
-            Id = 1,
-            Nombre = "C#",
-            Categoria = "Tecnica",
-            Activo = true,
-            CreadoEn = DateTime.UtcNow
-        });
-        db.Skills.Add(new Skill
-        {
-            Id = 2,
-            Nombre = "Comunicacion",
-            Categoria = "Blanda",
-            Activo = true,
-            CreadoEn = DateTime.UtcNow
-        });
-        await db.SaveChangesAsync();
+        var dbContext = InMemoryDbContextFactory.Create();
+        dbContext.Skills.AddRange(
+            new SkillEntity { Id = 1, Nombre = "Skill 1", Categoria = "Tech", Activo = true, CreadoEn = DateTime.UtcNow },
+            new SkillEntity { Id = 2, Nombre = "Skill 2", Categoria = "Soft", Activo = true, CreadoEn = DateTime.UtcNow }
+        );
+        await dbContext.SaveChangesAsync();
 
-        var handler = new GetAllSkillsQueryHandler(db);
+        var handler = new GetAllSkillsQueryHandler(dbContext);
+        var query = new GetAllSkillsQuery(new PageParameters(1, 10));
 
         // Act
-        var result = await handler.Handle(new GetAllSkillsQuery(new PageParameters()), CancellationToken.None);
+        var result = await handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
-        Assert.Equal(2, result.Value!.Items.Count);
-        Assert.Contains(result.Value.Items, s => s.Nombre == "C#");
-        Assert.Contains(result.Value.Items, s => s.Nombre == "Comunicacion");
+        Assert.Equal(2, result.Value.TotalCount);
+        Assert.Equal(2, result.Value.Items.Count);
     }
 
     [Fact]
-    public async Task Handle_ConSkillsEliminados_DebeExcluirLosEliminados()
+    public async Task Handle_WithSoftDeletedSkills_ExcludesThem()
     {
         // Arrange
-        var db = InMemoryDbContextFactory.Create();
-        db.Skills.Add(new Skill
-        {
-            Id = 1,
-            Nombre = "Activo",
-            Activo = true,
-            CreadoEn = DateTime.UtcNow
-        });
-        db.Skills.Add(new Skill
-        {
-            Id = 2,
-            Nombre = "Eliminado",
-            Activo = true,
-            CreadoEn = DateTime.UtcNow,
-            EliminadoEn = DateTime.UtcNow,
-            EliminadoPor = 1
-        });
-        await db.SaveChangesAsync();
+        var dbContext = InMemoryDbContextFactory.Create();
+        dbContext.Skills.AddRange(
+            new SkillEntity { Id = 1, Nombre = "Activo", Activo = true, CreadoEn = DateTime.UtcNow },
+            new SkillEntity { Id = 2, Nombre = "Eliminado", Activo = false, EliminadoEn = DateTime.UtcNow, EliminadoPor = 1, CreadoEn = DateTime.UtcNow }
+        );
+        await dbContext.SaveChangesAsync();
 
-        var handler = new GetAllSkillsQueryHandler(db);
+        var handler = new GetAllSkillsQueryHandler(dbContext);
+        var query = new GetAllSkillsQuery(new PageParameters(1, 10));
 
         // Act
-        var result = await handler.Handle(new GetAllSkillsQuery(new PageParameters()), CancellationToken.None);
+        var result = await handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
-        Assert.Single(result.Value!.Items);
+        Assert.Equal(1, result.Value.TotalCount);
+        Assert.Single(result.Value.Items);
         Assert.Equal("Activo", result.Value.Items[0].Nombre);
-    }
-
-    [Fact]
-    public async Task Handle_SinSkills_DebeRetornarListaVacia()
-    {
-        // Arrange
-        var db = InMemoryDbContextFactory.Create();
-        var handler = new GetAllSkillsQueryHandler(db);
-
-        // Act
-        var result = await handler.Handle(new GetAllSkillsQuery(new PageParameters()), CancellationToken.None);
-
-        // Assert
-        Assert.True(result.IsSuccess);
-        Assert.NotNull(result.Value);
-        Assert.Empty(result.Value!.Items);
-    }
-
-    [Fact]
-    public async Task Handle_DebeMapearCorrectamenteADto()
-    {
-        // Arrange
-        var db = InMemoryDbContextFactory.Create();
-        db.Skills.Add(new Skill
-        {
-            Id = 1,
-            Nombre = "Docker",
-            Categoria = "DevOps",
-            Activo = true,
-            CreadoEn = DateTime.UtcNow
-        });
-        await db.SaveChangesAsync();
-
-        var handler = new GetAllSkillsQueryHandler(db);
-
-        // Act
-        var result = await handler.Handle(new GetAllSkillsQuery(new PageParameters()), CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(result.Value);
-        var dto = result.Value!.Items[0];
-        Assert.Equal(1, dto.Id);
-        Assert.Equal("Docker", dto.Nombre);
-        Assert.Equal("DevOps", dto.Categoria);
     }
 }

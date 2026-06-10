@@ -6,22 +6,25 @@ using SGVO.Shared;
 
 namespace SGVO.Infrastructure.Queries;
 
-public sealed class GetVacanteByIdQueryHandler : IQueryHandler<GetVacanteByIdQuery, VacanteDto?>
+/// <summary>
+/// Handler para GetVacanteByIdQuery. Retorna una vacante por ID excluyendo soft-deleted.
+/// </summary>
+public class GetVacanteByIdQueryHandler : IQueryHandler<GetVacanteByIdQuery, VacanteDto?>
 {
-    private readonly SgvoDbContext _db;
+    private readonly SgvoDbContext _dbContext;
 
-    public GetVacanteByIdQueryHandler(SgvoDbContext db)
+    public GetVacanteByIdQueryHandler(SgvoDbContext dbContext)
     {
-        _db = db;
+        _dbContext = dbContext;
     }
 
     public async Task<Result<VacanteDto?>> Handle(
-        GetVacanteByIdQuery query,
-        CancellationToken cancellationToken = default)
+        GetVacanteByIdQuery request,
+        CancellationToken cancellationToken)
     {
-        var vacante = await _db.Vacantes
+        var vacante = await _dbContext.Vacantes
             .AsNoTracking()
-            .Where(v => v.Id == (ulong)query.Id && v.EliminadoEn == null && v.EliminadoPor == null)
+            .Where(v => v.Id == (ulong)request.Id && v.EliminadoEn == null && v.EliminadoPor == null)
             .Select(v => new VacanteDto
             {
                 Id = (long)v.Id,

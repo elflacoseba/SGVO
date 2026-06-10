@@ -6,32 +6,35 @@ using SGVO.Shared;
 
 namespace SGVO.Infrastructure.Queries;
 
-public sealed class GetAllCargosQueryHandler : IQueryHandler<GetAllCargosQuery, PagedResult<CargoDto>>
+/// <summary>
+/// Handler para GetAllCargosQuery. Retorna cargos paginados excluyendo soft-deleted.
+/// </summary>
+public class GetAllCargosQueryHandler : IQueryHandler<GetAllCargosQuery, PagedResult<CargoDto>>
 {
-    private readonly SgvoDbContext _db;
+    private readonly SgvoDbContext _dbContext;
 
-    public GetAllCargosQueryHandler(SgvoDbContext db)
+    public GetAllCargosQueryHandler(SgvoDbContext dbContext)
     {
-        _db = db;
+        _dbContext = dbContext;
     }
 
     public async Task<Result<PagedResult<CargoDto>>> Handle(
-        GetAllCargosQuery query,
-        CancellationToken cancellationToken = default)
+        GetAllCargosQuery request,
+        CancellationToken cancellationToken)
     {
-        var page = query.Pagination.Normalize();
+        var normalized = request.Pagination.Normalize();
 
-        var filtered = _db.Cargos
+        var query = _dbContext.Cargos
             .AsNoTracking()
             .Where(c => c.EliminadoEn == null && c.EliminadoPor == null);
 
-        var totalCount = await filtered.CountAsync(cancellationToken);
-        var totalPages = (int)Math.Ceiling(totalCount / (double)page.PageSize);
+        var totalCount = await query.CountAsync(cancellationToken);
+        var totalPages = (int)Math.Ceiling(totalCount / (double)normalized.PageSize);
 
-        var cargos = await filtered
+        var cargos = await query
             .OrderBy(c => c.Id)
-            .Skip(page.SkipCount)
-            .Take(page.PageSize)
+            .Skip(normalized.SkipCount)
+            .Take(normalized.PageSize)
             .Select(c => new CargoDto
             {
                 Id = (long)c.Id,
@@ -40,7 +43,7 @@ public sealed class GetAllCargosQueryHandler : IQueryHandler<GetAllCargosQuery, 
             })
             .ToListAsync(cancellationToken);
 
-        return Result<PagedResult<CargoDto>>.Success(
-            new PagedResult<CargoDto>(cargos, totalCount, page.Page, page.PageSize, totalPages));
+        var result = new PagedResult<CargoDto>(cargos, totalCount, normalized.Page, normalized.PageSize, totalPages);
+        return Result<PagedResult<CargoDto>>.Success(result);
     }
 }
