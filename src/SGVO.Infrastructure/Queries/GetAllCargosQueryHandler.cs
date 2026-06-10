@@ -6,7 +6,7 @@ using SGVO.Shared;
 
 namespace SGVO.Infrastructure.Queries;
 
-public sealed class GetAllCargosQueryHandler : IQueryHandler<GetAllCargosQuery, IReadOnlyList<CargoDto>>
+public sealed class GetAllCargosQueryHandler : IQueryHandler<GetAllCargosQuery, PagedResult<CargoDto>>
 {
     private readonly SgvoDbContext _db;
 
@@ -15,13 +15,23 @@ public sealed class GetAllCargosQueryHandler : IQueryHandler<GetAllCargosQuery, 
         _db = db;
     }
 
-    public async Task<Result<IReadOnlyList<CargoDto>>> Handle(
+    public async Task<Result<PagedResult<CargoDto>>> Handle(
         GetAllCargosQuery query,
         CancellationToken cancellationToken = default)
     {
-        var cargos = await _db.Cargos
+        var page = query.Pagination.Normalize();
+
+        var filtered = _db.Cargos
             .AsNoTracking()
-            .Where(c => c.EliminadoEn == null && c.EliminadoPor == null)
+            .Where(c => c.EliminadoEn == null && c.EliminadoPor == null);
+
+        var totalCount = await filtered.CountAsync(cancellationToken);
+        var totalPages = (int)Math.Ceiling(totalCount / (double)page.PageSize);
+
+        var cargos = await filtered
+            .OrderBy(c => c.Id)
+            .Skip(page.SkipCount)
+            .Take(page.PageSize)
             .Select(c => new CargoDto
             {
                 Id = (long)c.Id,
@@ -30,6 +40,7 @@ public sealed class GetAllCargosQueryHandler : IQueryHandler<GetAllCargosQuery, 
             })
             .ToListAsync(cancellationToken);
 
-        return Result<IReadOnlyList<CargoDto>>.Success(cargos);
+        return Result<PagedResult<CargoDto>>.Success(
+            new PagedResult<CargoDto>(cargos, totalCount, page.Page, page.PageSize, totalPages));
     }
 }

@@ -6,7 +6,7 @@ using SGVO.Shared;
 
 namespace SGVO.Infrastructure.Queries;
 
-public sealed class GetAllPostulantesQueryHandler : IQueryHandler<GetAllPostulantesQuery, IReadOnlyList<PostulanteDto>>
+public sealed class GetAllPostulantesQueryHandler : IQueryHandler<GetAllPostulantesQuery, PagedResult<PostulanteDto>>
 {
     private readonly SgvoDbContext _db;
 
@@ -15,13 +15,23 @@ public sealed class GetAllPostulantesQueryHandler : IQueryHandler<GetAllPostulan
         _db = db;
     }
 
-    public async Task<Result<IReadOnlyList<PostulanteDto>>> Handle(
+    public async Task<Result<PagedResult<PostulanteDto>>> Handle(
         GetAllPostulantesQuery query,
         CancellationToken cancellationToken = default)
     {
-        var postulantes = await _db.Postulantes
+        var page = query.Pagination.Normalize();
+
+        var filtered = _db.Postulantes
             .AsNoTracking()
-            .Where(p => p.EliminadoEn == null && p.EliminadoPor == null)
+            .Where(p => p.EliminadoEn == null && p.EliminadoPor == null);
+
+        var totalCount = await filtered.CountAsync(cancellationToken);
+        var totalPages = (int)Math.Ceiling(totalCount / (double)page.PageSize);
+
+        var postulantes = await filtered
+            .OrderBy(p => p.Id)
+            .Skip(page.SkipCount)
+            .Take(page.PageSize)
             .Select(p => new PostulanteDto
             {
                 Id = (long)p.Id,
@@ -32,6 +42,7 @@ public sealed class GetAllPostulantesQueryHandler : IQueryHandler<GetAllPostulan
             })
             .ToListAsync(cancellationToken);
 
-        return Result<IReadOnlyList<PostulanteDto>>.Success(postulantes);
+        return Result<PagedResult<PostulanteDto>>.Success(
+            new PagedResult<PostulanteDto>(postulantes, totalCount, page.Page, page.PageSize, totalPages));
     }
 }

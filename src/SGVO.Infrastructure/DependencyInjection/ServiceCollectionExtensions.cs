@@ -29,11 +29,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDateTimeProvider, DateTimeProvider>();
 
         // Query handlers
-        services.AddScoped<IQueryHandler<GetAllVacantesQuery, IReadOnlyList<VacanteDto>>, GetAllVacantesQueryHandler>();
+        services.AddScoped<IQueryHandler<GetAllVacantesQuery, PagedResult<VacanteDto>>, GetAllVacantesQueryHandler>();
         services.AddScoped<IQueryHandler<GetVacanteByIdQuery, VacanteDto?>, GetVacanteByIdQueryHandler>();
-        services.AddScoped<IQueryHandler<GetAllCargosQuery, IReadOnlyList<CargoDto>>, GetAllCargosQueryHandler>();
-        services.AddScoped<IQueryHandler<GetAllPostulantesQuery, IReadOnlyList<PostulanteDto>>, GetAllPostulantesQueryHandler>();
-        services.AddScoped<IQueryHandler<GetAllSkillsQuery, IReadOnlyList<SkillDto>>, GetAllSkillsQueryHandler>();
+        services.AddScoped<IQueryHandler<GetAllCargosQuery, PagedResult<CargoDto>>, GetAllCargosQueryHandler>();
+        services.AddScoped<IQueryHandler<GetAllPostulantesQuery, PagedResult<PostulanteDto>>, GetAllPostulantesQueryHandler>();
+        services.AddScoped<IQueryHandler<GetAllSkillsQuery, PagedResult<SkillDto>>, GetAllSkillsQueryHandler>();
 
         return services;
     }

@@ -9,11 +9,11 @@ namespace SGVO.Api.Controllers;
 [Route("api/v1/vacantes")]
 public class VacantesController : ControllerBase
 {
-    private readonly IQueryHandler<GetAllVacantesQuery, IReadOnlyList<VacanteDto>> _getAll;
+    private readonly IQueryHandler<GetAllVacantesQuery, PagedResult<VacanteDto>> _getAll;
     private readonly IQueryHandler<GetVacanteByIdQuery, VacanteDto?> _getById;
 
     public VacantesController(
-        IQueryHandler<GetAllVacantesQuery, IReadOnlyList<VacanteDto>> getAll,
+        IQueryHandler<GetAllVacantesQuery, PagedResult<VacanteDto>> getAll,
         IQueryHandler<GetVacanteByIdQuery, VacanteDto?> getById)
     {
         _getAll = getAll;
@@ -22,9 +22,13 @@ public class VacantesController : ControllerBase
 
     [HttpGet]
     [EndpointName("GetVacantes")]
-    public async Task<IActionResult> GetAll(CancellationToken ct)
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken ct = default)
     {
-        var result = await _getAll.Handle(new GetAllVacantesQuery(), ct);
+        var pagination = new PageParameters(page, pageSize);
+        var result = await _getAll.Handle(new GetAllVacantesQuery(pagination), ct);
 
         if (result.IsFailure)
             return result.ToErrorActionResult();

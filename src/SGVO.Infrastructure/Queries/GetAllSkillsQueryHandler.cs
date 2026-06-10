@@ -6,7 +6,7 @@ using SGVO.Shared;
 
 namespace SGVO.Infrastructure.Queries;
 
-public sealed class GetAllSkillsQueryHandler : IQueryHandler<GetAllSkillsQuery, IReadOnlyList<SkillDto>>
+public sealed class GetAllSkillsQueryHandler : IQueryHandler<GetAllSkillsQuery, PagedResult<SkillDto>>
 {
     private readonly SgvoDbContext _db;
 
@@ -15,13 +15,23 @@ public sealed class GetAllSkillsQueryHandler : IQueryHandler<GetAllSkillsQuery, 
         _db = db;
     }
 
-    public async Task<Result<IReadOnlyList<SkillDto>>> Handle(
+    public async Task<Result<PagedResult<SkillDto>>> Handle(
         GetAllSkillsQuery query,
         CancellationToken cancellationToken = default)
     {
-        var skills = await _db.Skills
+        var page = query.Pagination.Normalize();
+
+        var filtered = _db.Skills
             .AsNoTracking()
-            .Where(s => s.EliminadoEn == null && s.EliminadoPor == null)
+            .Where(s => s.EliminadoEn == null && s.EliminadoPor == null);
+
+        var totalCount = await filtered.CountAsync(cancellationToken);
+        var totalPages = (int)Math.Ceiling(totalCount / (double)page.PageSize);
+
+        var skills = await filtered
+            .OrderBy(s => s.Id)
+            .Skip(page.SkipCount)
+            .Take(page.PageSize)
             .Select(s => new SkillDto
             {
                 Id = (long)s.Id,
@@ -30,6 +40,7 @@ public sealed class GetAllSkillsQueryHandler : IQueryHandler<GetAllSkillsQuery, 
             })
             .ToListAsync(cancellationToken);
 
-        return Result<IReadOnlyList<SkillDto>>.Success(skills);
+        return Result<PagedResult<SkillDto>>.Success(
+            new PagedResult<SkillDto>(skills, totalCount, page.Page, page.PageSize, totalPages));
     }
 }

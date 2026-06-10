@@ -1,3 +1,4 @@
+using SGVO.Application.Common;
 using SGVO.Application.Features.Vacantes.Queries;
 using SGVO.Infrastructure.Persistence.Entities;
 using SGVO.Infrastructure.Queries;
@@ -39,14 +40,14 @@ public class GetAllVacantesQueryHandlerTests
         var handler = new GetAllVacantesQueryHandler(db);
 
         // Act
-        var result = await handler.Handle(new GetAllVacantesQuery(), CancellationToken.None);
+        var result = await handler.Handle(new GetAllVacantesQuery(new PageParameters()), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
-        Assert.Equal(2, result.Value!.Count);
-        Assert.Contains(result.Value, v => v.Motivo == "Nueva posicion");
-        Assert.Contains(result.Value, v => v.Motivo == "Reemplazo");
+        Assert.Equal(2, result.Value!.Items.Count);
+        Assert.Contains(result.Value.Items, v => v.Motivo == "Nueva posicion");
+        Assert.Contains(result.Value.Items, v => v.Motivo == "Reemplazo");
     }
 
     [Fact]
@@ -81,13 +82,13 @@ public class GetAllVacantesQueryHandlerTests
         var handler = new GetAllVacantesQueryHandler(db);
 
         // Act
-        var result = await handler.Handle(new GetAllVacantesQuery(), CancellationToken.None);
+        var result = await handler.Handle(new GetAllVacantesQuery(new PageParameters()), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
-        Assert.Single(result.Value!);
-        Assert.Equal("Activa", result.Value![0].Motivo);
+        Assert.Single(result.Value!.Items);
+        Assert.Equal("Activa", result.Value.Items[0].Motivo);
     }
 
     [Fact]
@@ -98,12 +99,12 @@ public class GetAllVacantesQueryHandlerTests
         var handler = new GetAllVacantesQueryHandler(db);
 
         // Act
-        var result = await handler.Handle(new GetAllVacantesQuery(), CancellationToken.None);
+        var result = await handler.Handle(new GetAllVacantesQuery(new PageParameters()), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
-        Assert.Empty(result.Value!);
+        Assert.Empty(result.Value!.Items);
     }
 
     [Fact]
@@ -128,11 +129,11 @@ public class GetAllVacantesQueryHandlerTests
         var handler = new GetAllVacantesQueryHandler(db);
 
         // Act
-        var result = await handler.Handle(new GetAllVacantesQuery(), CancellationToken.None);
+        var result = await handler.Handle(new GetAllVacantesQuery(new PageParameters()), CancellationToken.None);
 
         // Assert
         Assert.NotNull(result.Value);
-        var dto = result.Value[0];
+        var dto = result.Value!.Items[0];
         Assert.Equal(1, dto.Id);
         Assert.Equal(10, dto.PuestoId);
         Assert.Equal(fechaApertura, dto.FechaApertura);

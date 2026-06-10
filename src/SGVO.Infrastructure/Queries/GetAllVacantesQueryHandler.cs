@@ -6,7 +6,7 @@ using SGVO.Shared;
 
 namespace SGVO.Infrastructure.Queries;
 
-public sealed class GetAllVacantesQueryHandler : IQueryHandler<GetAllVacantesQuery, IReadOnlyList<VacanteDto>>
+public sealed class GetAllVacantesQueryHandler : IQueryHandler<GetAllVacantesQuery, PagedResult<VacanteDto>>
 {
     private readonly SgvoDbContext _db;
 
@@ -15,13 +15,23 @@ public sealed class GetAllVacantesQueryHandler : IQueryHandler<GetAllVacantesQue
         _db = db;
     }
 
-    public async Task<Result<IReadOnlyList<VacanteDto>>> Handle(
+    public async Task<Result<PagedResult<VacanteDto>>> Handle(
         GetAllVacantesQuery query,
         CancellationToken cancellationToken = default)
     {
-        var vacantes = await _db.Vacantes
+        var page = query.Pagination.Normalize();
+
+        var filtered = _db.Vacantes
             .AsNoTracking()
-            .Where(v => v.EliminadoEn == null && v.EliminadoPor == null)
+            .Where(v => v.EliminadoEn == null && v.EliminadoPor == null);
+
+        var totalCount = await filtered.CountAsync(cancellationToken);
+        var totalPages = (int)Math.Ceiling(totalCount / (double)page.PageSize);
+
+        var vacantes = await filtered
+            .OrderBy(v => v.Id)
+            .Skip(page.SkipCount)
+            .Take(page.PageSize)
             .Select(v => new VacanteDto
             {
                 Id = (long)v.Id,
@@ -33,6 +43,7 @@ public sealed class GetAllVacantesQueryHandler : IQueryHandler<GetAllVacantesQue
             })
             .ToListAsync(cancellationToken);
 
-        return Result<IReadOnlyList<VacanteDto>>.Success(vacantes);
+        return Result<PagedResult<VacanteDto>>.Success(
+            new PagedResult<VacanteDto>(vacantes, totalCount, page.Page, page.PageSize, totalPages));
     }
 }

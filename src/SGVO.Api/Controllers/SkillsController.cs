@@ -1,30 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
-using SGVO.Api.Extensions;
 using SGVO.Application.Common;
 using SGVO.Application.Features.Skills.Queries;
 
 namespace SGVO.Api.Controllers;
 
-[ApiController]
 [Route("api/v1/skills")]
-public class SkillsController : ControllerBase
+public class SkillsController : BaseReadOnlyController<GetAllSkillsQuery, SkillDto>
 {
-    private readonly IQueryHandler<GetAllSkillsQuery, IReadOnlyList<SkillDto>> _getAll;
-
-    public SkillsController(IQueryHandler<GetAllSkillsQuery, IReadOnlyList<SkillDto>> getAll)
+    public SkillsController(IQueryHandler<GetAllSkillsQuery, PagedResult<SkillDto>> getAll)
+        : base(getAll)
     {
-        _getAll = getAll;
     }
 
-    [HttpGet]
-    [EndpointName("GetSkills")]
-    public async Task<IActionResult> GetAll(CancellationToken ct)
+    protected override GetAllSkillsQuery CreateQuery(PageParameters pagination)
     {
-        var result = await _getAll.Handle(new GetAllSkillsQuery(), ct);
-
-        if (result.IsFailure)
-            return result.ToErrorActionResult();
-
-        return Ok(result.Value);
+        return new GetAllSkillsQuery(pagination);
     }
 }

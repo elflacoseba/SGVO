@@ -2,4 +2,4 @@ using SGVO.Application.Common;
 
 namespace SGVO.Application.Features.Postulantes.Queries;
 
-public sealed record GetAllPostulantesQuery : IQuery<IReadOnlyList<PostulanteDto>>;
+public sealed record GetAllPostulantesQuery(PageParameters Pagination) : IQuery<PagedResult<PostulanteDto>>;

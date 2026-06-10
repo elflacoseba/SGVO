@@ -1,3 +1,4 @@
+using SGVO.Application.Common;
 using SGVO.Application.Features.Skills.Queries;
 using SGVO.Infrastructure.Persistence.Entities;
 using SGVO.Infrastructure.Queries;
@@ -35,14 +36,14 @@ public class GetAllSkillsQueryHandlerTests
         var handler = new GetAllSkillsQueryHandler(db);
 
         // Act
-        var result = await handler.Handle(new GetAllSkillsQuery(), CancellationToken.None);
+        var result = await handler.Handle(new GetAllSkillsQuery(new PageParameters()), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
-        Assert.Equal(2, result.Value!.Count);
-        Assert.Contains(result.Value, s => s.Nombre == "C#");
-        Assert.Contains(result.Value, s => s.Nombre == "Comunicacion");
+        Assert.Equal(2, result.Value!.Items.Count);
+        Assert.Contains(result.Value.Items, s => s.Nombre == "C#");
+        Assert.Contains(result.Value.Items, s => s.Nombre == "Comunicacion");
     }
 
     [Fact]
@@ -71,13 +72,13 @@ public class GetAllSkillsQueryHandlerTests
         var handler = new GetAllSkillsQueryHandler(db);
 
         // Act
-        var result = await handler.Handle(new GetAllSkillsQuery(), CancellationToken.None);
+        var result = await handler.Handle(new GetAllSkillsQuery(new PageParameters()), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
-        Assert.Single(result.Value!);
-        Assert.Equal("Activo", result.Value![0].Nombre);
+        Assert.Single(result.Value!.Items);
+        Assert.Equal("Activo", result.Value.Items[0].Nombre);
     }
 
     [Fact]
@@ -88,12 +89,12 @@ public class GetAllSkillsQueryHandlerTests
         var handler = new GetAllSkillsQueryHandler(db);
 
         // Act
-        var result = await handler.Handle(new GetAllSkillsQuery(), CancellationToken.None);
+        var result = await handler.Handle(new GetAllSkillsQuery(new PageParameters()), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
-        Assert.Empty(result.Value!);
+        Assert.Empty(result.Value!.Items);
     }
 
     [Fact]
@@ -114,11 +115,11 @@ public class GetAllSkillsQueryHandlerTests
         var handler = new GetAllSkillsQueryHandler(db);
 
         // Act
-        var result = await handler.Handle(new GetAllSkillsQuery(), CancellationToken.None);
+        var result = await handler.Handle(new GetAllSkillsQuery(new PageParameters()), CancellationToken.None);
 
         // Assert
         Assert.NotNull(result.Value);
-        var dto = result.Value[0];
+        var dto = result.Value!.Items[0];
         Assert.Equal(1, dto.Id);
         Assert.Equal("Docker", dto.Nombre);
         Assert.Equal("DevOps", dto.Categoria);
