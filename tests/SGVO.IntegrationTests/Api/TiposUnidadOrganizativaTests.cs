@@ -16,6 +16,7 @@ namespace SGVO.IntegrationTests.Api;
 /// Uses the real local MySQL database with test auth.
 /// Tests clean up after themselves.
 /// </summary>
+[Collection("IntegrationTests")]
 public class TiposUnidadOrganizativaTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
@@ -47,11 +48,20 @@ public class TiposUnidadOrganizativaTests : IClassFixture<WebApplicationFactory<
         var context = CreateDbContext();
         var seeded = new List<TipoUnidadOrganizativaEntity>();
 
-        // Clean any leftover test data
-        var existing = await context.TiposUnidadOrganizativa
+        // Clean any leftover test data — units BEFORE tipos (FK constraint)
+        var existingTipos = await context.TiposUnidadOrganizativa
             .Where(t => t.Nombre.StartsWith("TEST_"))
             .ToListAsync();
-        context.TiposUnidadOrganizativa.RemoveRange(existing);
+        var existingTipoIds = existingTipos.Select(t => t.Id).ToList();
+
+        var existingUnits = await context.UnidadesOrganizativas
+            .Where(u => u.Nombre.StartsWith("TEST_") || existingTipoIds.Contains(u.TipoUnidadOrganizativaId))
+            .ToListAsync();
+        context.UnidadesOrganizativas.RemoveRange(existingUnits);
+        await context.SaveChangesAsync();
+
+        context.TiposUnidadOrganizativa.RemoveRange(existingTipos);
+        await context.SaveChangesAsync();
 
         var tipos = new[]
         {
@@ -79,12 +89,13 @@ public class TiposUnidadOrganizativaTests : IClassFixture<WebApplicationFactory<
 
     private static async Task CleanupAsync(SgvoDbContext context, List<TipoUnidadOrganizativaEntity> seeded)
     {
-        // Remove seeded test data and any units referencing them
+        // Remove seeded test data — units BEFORE tipos (FK constraint)
         var seededIds = seeded.Select(t => t.Id).ToList();
         var units = await context.UnidadesOrganizativas
             .Where(u => seededIds.Contains(u.TipoUnidadOrganizativaId))
             .ToListAsync();
         context.UnidadesOrganizativas.RemoveRange(units);
+        await context.SaveChangesAsync();
 
         var tipos = await context.TiposUnidadOrganizativa
             .Where(t => seededIds.Contains(t.Id))
