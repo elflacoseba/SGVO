@@ -25,7 +25,7 @@ public static class ValidationBehavior
         if (!validationResult.IsValid)
         {
             var error = validationResult.Errors.First().ErrorMessage;
-            return Result<TResponse>.Failure(error, "VALIDATION_ERROR");
+            return Result<TResponse>.Failure(error, "VALIDATION");
         }
 
         return await handler(request, cancellationToken);
