@@ -108,8 +108,8 @@ Icon
 .opencode/cache/
 .opencode/tmp/
 .opencode/logs/
+openspec/
 .atl/
-
 
 # Engram
 .engram/cache/
@@ -122,3 +122,4 @@ appsettings.Local.json
 .env
 .env.*
 secrets.json
+
