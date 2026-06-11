@@ -5,7 +5,7 @@ namespace SGVO.Application.Features.UnidadesOrganizativas.Queries;
 /// <summary>
 /// Query to retrieve all active organizational units with pagination.
 /// </summary>
-public sealed record GetAllUnidadesOrganizativasQuery(PageParameters Pagination, string? Tipo = null) : IQuery<PagedResult<UnidadOrganizativaDto>>;
+public sealed record GetAllUnidadesOrganizativasQuery(PageParameters Pagination, long? TipoUnidadOrganizativaId = null) : IQuery<PagedResult<UnidadOrganizativaDto>>;
 
 /// <summary>
 /// Query to retrieve a single organizational unit by ID.

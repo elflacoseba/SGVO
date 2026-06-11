@@ -15,9 +15,13 @@ public class GetAllUnidadesOrganizativasQueryHandlerTests
     {
         // Arrange
         var dbContext = InMemoryDbContextFactory.Create();
+        dbContext.TiposUnidadOrganizativa.AddRange(
+            new TipoUnidadOrganizativaEntity { Id = 1, Nombre = "Facultad", Activo = true, CreadoEn = DateTime.UtcNow },
+            new TipoUnidadOrganizativaEntity { Id = 2, Nombre = "Secretaría", Activo = true, CreadoEn = DateTime.UtcNow }
+        );
         dbContext.UnidadesOrganizativas.AddRange(
-            new UnidadesOrganizativaEntity { Id = 1, Nombre = "Facultad de Cs", Tipo = "Facultad", NivelJerarquico = 1, Activo = true, CreadoEn = DateTime.UtcNow },
-            new UnidadesOrganizativaEntity { Id = 2, Nombre = "Secretaría Académica", Tipo = "Secretaría", NivelJerarquico = 1, Activo = true, CreadoEn = DateTime.UtcNow }
+            new UnidadesOrganizativaEntity { Id = 1, Nombre = "Facultad de Cs", TipoUnidadOrganizativaId = 1, NivelJerarquico = 1, Activo = true, CreadoEn = DateTime.UtcNow },
+            new UnidadesOrganizativaEntity { Id = 2, Nombre = "Secretaría Académica", TipoUnidadOrganizativaId = 2, NivelJerarquico = 1, Activo = true, CreadoEn = DateTime.UtcNow }
         );
         await dbContext.SaveChangesAsync();
 
@@ -39,9 +43,12 @@ public class GetAllUnidadesOrganizativasQueryHandlerTests
     {
         // Arrange
         var dbContext = InMemoryDbContextFactory.Create();
+        dbContext.TiposUnidadOrganizativa.Add(
+            new TipoUnidadOrganizativaEntity { Id = 1, Nombre = "Facultad", Activo = true, CreadoEn = DateTime.UtcNow }
+        );
         dbContext.UnidadesOrganizativas.AddRange(
-            new UnidadesOrganizativaEntity { Id = 1, Nombre = "Activa", Tipo = "Facultad", Activo = true, CreadoEn = DateTime.UtcNow },
-            new UnidadesOrganizativaEntity { Id = 2, Nombre = "Eliminada", Tipo = "Facultad", Activo = false, EliminadoEn = DateTime.UtcNow, EliminadoPor = 1, CreadoEn = DateTime.UtcNow }
+            new UnidadesOrganizativaEntity { Id = 1, Nombre = "Activa", TipoUnidadOrganizativaId = 1, Activo = true, CreadoEn = DateTime.UtcNow },
+            new UnidadesOrganizativaEntity { Id = 2, Nombre = "Eliminada", TipoUnidadOrganizativaId = 1, Activo = false, EliminadoEn = DateTime.UtcNow, EliminadoPor = 1, CreadoEn = DateTime.UtcNow }
         );
         await dbContext.SaveChangesAsync();
 
@@ -64,13 +71,16 @@ public class GetAllUnidadesOrganizativasQueryHandlerTests
     {
         // Arrange
         var dbContext = InMemoryDbContextFactory.Create();
+        dbContext.TiposUnidadOrganizativa.Add(
+            new TipoUnidadOrganizativaEntity { Id = 1, Nombre = "Departamento", Activo = true, CreadoEn = DateTime.UtcNow }
+        );
         for (int i = 1; i <= 25; i++)
         {
             dbContext.UnidadesOrganizativas.Add(new UnidadesOrganizativaEntity
             {
                 Id = (ulong)i,
                 Nombre = $"Unidad {i}",
-                Tipo = "Departamento",
+                TipoUnidadOrganizativaId = 1,
                 Activo = true,
                 CreadoEn = DateTime.UtcNow
             });
@@ -97,15 +107,19 @@ public class GetAllUnidadesOrganizativasQueryHandlerTests
     {
         // Arrange
         var dbContext = InMemoryDbContextFactory.Create();
+        dbContext.TiposUnidadOrganizativa.AddRange(
+            new TipoUnidadOrganizativaEntity { Id = 1, Nombre = "Facultad", Activo = true, CreadoEn = DateTime.UtcNow },
+            new TipoUnidadOrganizativaEntity { Id = 2, Nombre = "Secretaría", Activo = true, CreadoEn = DateTime.UtcNow }
+        );
         dbContext.UnidadesOrganizativas.AddRange(
-            new UnidadesOrganizativaEntity { Id = 1, Nombre = "Facultad de Cs", Tipo = "Facultad", NivelJerarquico = 1, Activo = true, CreadoEn = DateTime.UtcNow },
-            new UnidadesOrganizativaEntity { Id = 2, Nombre = "Secretaría Académica", Tipo = "Secretaría", NivelJerarquico = 1, Activo = true, CreadoEn = DateTime.UtcNow },
-            new UnidadesOrganizativaEntity { Id = 3, Nombre = "Facultad de Ingeniería", Tipo = "Facultad", NivelJerarquico = 1, Activo = true, CreadoEn = DateTime.UtcNow }
+            new UnidadesOrganizativaEntity { Id = 1, Nombre = "Facultad de Cs", TipoUnidadOrganizativaId = 1, NivelJerarquico = 1, Activo = true, CreadoEn = DateTime.UtcNow },
+            new UnidadesOrganizativaEntity { Id = 2, Nombre = "Secretaría Académica", TipoUnidadOrganizativaId = 2, NivelJerarquico = 1, Activo = true, CreadoEn = DateTime.UtcNow },
+            new UnidadesOrganizativaEntity { Id = 3, Nombre = "Facultad de Ingeniería", TipoUnidadOrganizativaId = 1, NivelJerarquico = 1, Activo = true, CreadoEn = DateTime.UtcNow }
         );
         await dbContext.SaveChangesAsync();
 
         var handler = new GetAllUnidadesOrganizativasQueryHandler(dbContext);
-        var query = new GetAllUnidadesOrganizativasQuery(new PageParameters(1, 10), Tipo: "Facultad");
+        var query = new GetAllUnidadesOrganizativasQuery(new PageParameters(1, 10), TipoUnidadOrganizativaId: 1);
 
         // Act
         var result = await handler.Handle(query, CancellationToken.None);
@@ -114,6 +128,6 @@ public class GetAllUnidadesOrganizativasQueryHandlerTests
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
         Assert.Equal(2, result.Value.TotalCount);
-        Assert.All(result.Value.Items, item => Assert.Equal("Facultad", item.Tipo));
+        Assert.All(result.Value.Items, item => Assert.Equal(1, item.TipoUnidadOrganizativaId));
     }
 }
