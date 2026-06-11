@@ -10,6 +10,7 @@ using SGVO.Shared;
 using SGVO.Application.Features.Cargos.Queries;
 using SGVO.Application.Features.Postulantes.Queries;
 using SGVO.Application.Features.Skills.Queries;
+using SGVO.Application.Features.UnidadesOrganizativas.Queries;
 using SGVO.Application.Features.Vacantes.Queries;
 using SGVO.Domain.Interfaces;
 using SGVO.Infrastructure.Persistence;
@@ -45,6 +46,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IQueryHandler<GetAllPostulantesQuery, PagedResult<PostulanteDto>>, GetAllPostulantesQueryHandler>();
         services.AddScoped<IQueryHandler<GetAllSkillsQuery, PagedResult<SkillDto>>, GetAllSkillsQueryHandler>();
         services.AddScoped<IQueryHandler<GetCurrentUserQuery, UserDto?>, GetCurrentUserQueryHandler>();
+
+        // UnidadesOrganizativas query handlers
+        services.AddScoped<IQueryHandler<GetAllUnidadesOrganizativasQuery, PagedResult<UnidadOrganizativaDto>>, GetAllUnidadesOrganizativasQueryHandler>();
+        services.AddScoped<IQueryHandler<GetUnidadOrganizativaByIdQuery, UnidadOrganizativaDetailDto?>, GetUnidadOrganizativaByIdQueryHandler>();
+        services.AddScoped<IQueryHandler<GetUnidadesOrganizativasTreeQuery, IReadOnlyList<UnidadOrganizativaTreeDto>>, GetUnidadesOrganizativasTreeQueryHandler>();
 
         // Command handlers
         services.AddScoped<ICommandHandler<LoginCommand, LoginResponseDto>, LoginCommandHandler>();
