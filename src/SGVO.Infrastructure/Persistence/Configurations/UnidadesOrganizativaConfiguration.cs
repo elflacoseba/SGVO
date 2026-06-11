@@ -17,10 +17,7 @@ public class UnidadesOrganizativaConfiguration : IEntityTypeConfiguration<Unidad
 
         builder.Property(e => e.Nombre)
             .IsRequired()
-            .HasMaxLength(150);
-
-        builder.Property(e => e.Descripcion)
-            .HasMaxLength(500);
+            .HasMaxLength(200);
 
         builder.Property(e => e.Tipo)
             .IsRequired()

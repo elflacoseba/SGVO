@@ -1,0 +1,14 @@
+change: unidades-organizativas
+phase: verify
+status: completed
+artifact_store: openspec
+delivery_strategy: ask-on-risk
+review_budget: 400
+created: 2026-06-10
+spec_artifacts:
+  - openspec/changes/unidades-organizativas/specs/unidades-organizativas/spec.md
+  - openspec/changes/unidades-organizativas/proposal.md
+design_artifact:
+  - openspec/changes/unidades-organizativas/design.md
+tasks_artifact:
+  - openspec/changes/unidades-organizativas/tasks.md

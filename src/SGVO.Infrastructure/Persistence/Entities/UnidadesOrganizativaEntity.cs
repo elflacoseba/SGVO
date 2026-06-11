@@ -9,7 +9,6 @@ public class UnidadesOrganizativaEntity
 {
     public ulong Id { get; set; }
     public string Nombre { get; set; } = null!;
-    public string? Descripcion { get; set; }
     public string Tipo { get; set; } = null!;
     public int? NivelJerarquico { get; set; }
     public ulong? PadreId { get; set; }
