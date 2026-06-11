@@ -26,10 +26,10 @@ public class GetAllUnidadesOrganizativasQueryHandler : IQueryHandler<GetAllUnida
 
         var query = _dbContext.UnidadesOrganizativas
             .AsNoTracking()
-            .Where(e => e.EliminadoEn == null && e.EliminadoPor == null);
+            .Where(e => e.EliminadoEn == null);
 
         if (request.TipoUnidadOrganizativaId.HasValue)
-            query = query.Where(e => e.TipoUnidadOrganizativaId == (ulong)request.TipoUnidadOrganizativaId.Value);
+            query = query.Where(e => e.TipoUnidadOrganizativaId == request.TipoUnidadOrganizativaId.Value);
 
         var totalCount = await query.CountAsync(cancellationToken);
         var totalPages = (int)Math.Ceiling(totalCount / (double)normalized.PageSize);
@@ -40,13 +40,13 @@ public class GetAllUnidadesOrganizativasQueryHandler : IQueryHandler<GetAllUnida
             .Take(normalized.PageSize)
             .Select(e => new UnidadOrganizativaDto
             {
-                Id = (long)e.Id,
+                Id = e.Id,
                 Nombre = e.Nombre,
-                TipoUnidadOrganizativaId = (long)e.TipoUnidadOrganizativaId,
+                TipoUnidadOrganizativaId = e.TipoUnidadOrganizativaId,
                 TipoNombre = e.TipoUnidadOrganizativa != null ? e.TipoUnidadOrganizativa.Nombre : string.Empty,
                 NivelJerarquico = e.NivelJerarquico,
-                PadreId = e.PadreId != null ? (long)e.PadreId : null,
-                Activo = e.Activo ?? false
+                PadreId = e.PadreId,
+                Activo = e.Activo
             })
             .ToListAsync(cancellationToken);
 

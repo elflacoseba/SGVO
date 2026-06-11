@@ -7,13 +7,13 @@ namespace SGVO.Infrastructure.Persistence.Entities;
 /// </summary>
 public class CargoSkillEntity
 {
-    public ulong Id { get; set; }
-    public ulong CargoId { get; set; }
-    public ulong SkillId { get; set; }
+    public long Id { get; set; }
+    public long CargoId { get; set; }
+    public long SkillId { get; set; }
     public int NivelImportancia { get; set; }
     public bool? Activo { get; set; }
     public DateTime? EliminadoEn { get; set; }
-    public ulong? EliminadoPor { get; set; }
+    public long? EliminadoPor { get; set; }
 
     // Navigation properties
     public virtual CargoEntity Cargo { get; set; } = null!;

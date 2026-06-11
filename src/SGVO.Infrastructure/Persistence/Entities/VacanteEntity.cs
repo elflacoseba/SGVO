@@ -7,19 +7,19 @@ namespace SGVO.Infrastructure.Persistence.Entities;
 /// </summary>
 public class VacanteEntity
 {
-    public ulong Id { get; set; }
-    public ulong PuestoId { get; set; }
+    public long Id { get; set; }
+    public long PuestoId { get; set; }
     public DateTime FechaApertura { get; set; }
     public DateTime? FechaCierre { get; set; }
     public string Motivo { get; set; } = null!;
     public string Estado { get; set; } = null!;
     public string? Observaciones { get; set; }
-    public ulong? ResponsableId { get; set; }
+    public long? ResponsableId { get; set; }
     public bool? Activo { get; set; }
     public DateTime CreadoEn { get; set; }
     public DateTime? ModificadoEn { get; set; }
     public DateTime? EliminadoEn { get; set; }
-    public ulong? EliminadoPor { get; set; }
+    public long? EliminadoPor { get; set; }
 
     // Navigation properties
     public virtual UsuarioEntity? EliminadoPorNavigation { get; set; }

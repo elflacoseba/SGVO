@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SGVO.Infrastructure.Persistence.Entities;
+using SGVO.Shared;
 
 namespace SGVO.Infrastructure.Persistence.Configurations;
 
@@ -17,7 +18,7 @@ public class TipoUnidadOrganizativaConfiguration : IEntityTypeConfiguration<Tipo
 
         builder.Property(e => e.Nombre)
             .IsRequired()
-            .HasMaxLength(100);
+            .HasMaxLength(DomainConstants.TipoUnidadOrganizativaNombreMaxLength);
 
         builder.HasIndex(e => e.Nombre)
             .IsUnique()

@@ -7,8 +7,8 @@ namespace SGVO.Infrastructure.Persistence.Entities;
 /// </summary>
 public class PostulanteEntity
 {
-    public ulong Id { get; set; }
-    public ulong? PersonaId { get; set; }
+    public long Id { get; set; }
+    public long? PersonaId { get; set; }
     public string Nombre { get; set; } = null!;
     public string Apellido { get; set; } = null!;
     public string Email { get; set; } = null!;
@@ -18,7 +18,7 @@ public class PostulanteEntity
     public bool? Activo { get; set; }
     public DateTime CreadoEn { get; set; }
     public DateTime? EliminadoEn { get; set; }
-    public ulong? EliminadoPor { get; set; }
+    public long? EliminadoPor { get; set; }
 
     // Navigation properties
     public virtual UsuarioEntity? EliminadoPorNavigation { get; set; }

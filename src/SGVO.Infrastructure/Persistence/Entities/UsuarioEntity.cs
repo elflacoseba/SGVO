@@ -7,16 +7,16 @@ namespace SGVO.Infrastructure.Persistence.Entities;
 /// </summary>
 public class UsuarioEntity
 {
-    public ulong Id { get; set; }
-    public ulong? PersonaId { get; set; }
+    public long Id { get; set; }
+    public long? PersonaId { get; set; }
     public string NombreUsuario { get; set; } = null!;
     public string? Email { get; set; }
     public string PasswordHash { get; set; } = null!;
-    public bool? Activo { get; set; }
+    public bool Activo { get; set; }
     public DateTime CreadoEn { get; set; }
     public DateTime? ModificadoEn { get; set; }
     public DateTime? EliminadoEn { get; set; }
-    public ulong? EliminadoPor { get; set; }
+    public long? EliminadoPor { get; set; }
 
     // Navigation properties
     public virtual PersonaEntity? Persona { get; set; }

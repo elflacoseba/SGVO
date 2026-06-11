@@ -18,7 +18,7 @@ public class ClaimsPrincipalExtensionsTests
 
         var result = principal.GetUserId();
 
-        result.Should().Be(42UL);
+        result.Should().Be(42L);
     }
 
     [Fact]
@@ -30,7 +30,7 @@ public class ClaimsPrincipalExtensionsTests
 
         var result = principal.GetUserId();
 
-        result.Should().Be(99UL);
+        result.Should().Be(99L);
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class ClaimsPrincipalExtensionsTests
 
         var result = principal.GetUserId();
 
-        result.Should().Be(42UL);
+        result.Should().Be(42L);
     }
 
     [Fact]
@@ -81,6 +81,6 @@ public class ClaimsPrincipalExtensionsTests
 
         var result = principal.GetUserId();
 
-        result.Should().Be(0UL);
+        result.Should().Be(0L);
     }
 }

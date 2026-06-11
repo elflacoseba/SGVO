@@ -24,7 +24,7 @@ public class EliminarUnidadOrganizativaCommandHandler : ICommandHandler<Eliminar
         CancellationToken cancellationToken)
     {
         var entity = await _dbContext.UnidadesOrganizativas
-            .FirstOrDefaultAsync(e => e.Id == (ulong)command.Id, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == command.Id, cancellationToken);
 
         if (entity is null)
             return Result<Unit>.Failure(

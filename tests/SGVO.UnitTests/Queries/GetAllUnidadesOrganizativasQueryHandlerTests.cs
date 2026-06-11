@@ -78,7 +78,7 @@ public class GetAllUnidadesOrganizativasQueryHandlerTests
         {
             dbContext.UnidadesOrganizativas.Add(new UnidadesOrganizativaEntity
             {
-                Id = (ulong)i,
+                Id = i,
                 Nombre = $"Unidad {i}",
                 TipoUnidadOrganizativaId = 1,
                 Activo = true,

@@ -25,7 +25,7 @@ public class GetUnidadOrganizativaByIdQueryHandler : IQueryHandler<GetUnidadOrga
         var entity = await _dbContext.UnidadesOrganizativas
             .AsNoTracking()
             .Include(e => e.TipoUnidadOrganizativa)
-            .Where(e => e.Id == (ulong)request.Id && e.EliminadoEn == null && e.EliminadoPor == null)
+            .Where(e => e.Id == request.Id && e.EliminadoEn == null)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (entity is null)
@@ -37,8 +37,8 @@ public class GetUnidadOrganizativaByIdQueryHandler : IQueryHandler<GetUnidadOrga
         {
             var parentEntity = await _dbContext.UnidadesOrganizativas
                 .AsNoTracking()
-                .Where(e => e.Id == entity.PadreId.Value && e.EliminadoEn == null && e.EliminadoPor == null)
-                .Select(e => new UnidadOrganizativaParentDto { Id = (long)e.Id, Nombre = e.Nombre })
+                .Where(e => e.Id == entity.PadreId.Value && e.EliminadoEn == null)
+                .Select(e => new UnidadOrganizativaParentDto { Id = e.Id, Nombre = e.Nombre })
                 .FirstOrDefaultAsync(cancellationToken);
             parent = parentEntity;
         }
@@ -46,17 +46,17 @@ public class GetUnidadOrganizativaByIdQueryHandler : IQueryHandler<GetUnidadOrga
         // Count active children
         var childrenCount = await _dbContext.UnidadesOrganizativas
             .AsNoTracking()
-            .CountAsync(e => e.PadreId == entity.Id && e.EliminadoEn == null && e.EliminadoPor == null, cancellationToken);
+            .CountAsync(e => e.PadreId == entity.Id && e.EliminadoEn == null, cancellationToken);
 
         var dto = new UnidadOrganizativaDetailDto
         {
-            Id = (long)entity.Id,
+            Id = entity.Id,
             Nombre = entity.Nombre,
-            TipoUnidadOrganizativaId = (long)entity.TipoUnidadOrganizativaId,
+            TipoUnidadOrganizativaId = entity.TipoUnidadOrganizativaId,
             TipoNombre = entity.TipoUnidadOrganizativa?.Nombre ?? string.Empty,
             NivelJerarquico = entity.NivelJerarquico,
-            PadreId = entity.PadreId != null ? (long)entity.PadreId : null,
-            Activo = entity.Activo ?? false,
+            PadreId = entity.PadreId,
+            Activo = entity.Activo,
             CreadoEn = entity.CreadoEn,
             ModificadoEn = entity.ModificadoEn,
             Padre = parent,

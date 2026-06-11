@@ -76,7 +76,7 @@ public class JwtTokenServiceTests
 
         var result = _service.ValidateToken(token);
 
-        result.Should().Be(123UL);
+        result.Should().Be(123L);
     }
 
     [Fact]

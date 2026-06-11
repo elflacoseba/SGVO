@@ -1,4 +1,5 @@
 using FluentValidation;
+using SGVO.Shared;
 
 namespace SGVO.Application.Features.UnidadesOrganizativas.Commands;
 
@@ -12,8 +13,8 @@ public class CrearUnidadOrganizativaValidator : AbstractValidator<CrearUnidadOrg
         RuleFor(x => x.Nombre)
             .NotEmpty()
             .WithMessage("El nombre es obligatorio.")
-            .MaximumLength(200)
-            .WithMessage("El nombre no puede exceder los 200 caracteres.");
+            .MaximumLength(DomainConstants.UnidadOrganizativaNombreMaxLength)
+            .WithMessage($"El nombre no puede exceder los {DomainConstants.UnidadOrganizativaNombreMaxLength} caracteres.");
 
         RuleFor(x => x.TipoUnidadOrganizativaId)
             .GreaterThan(0)

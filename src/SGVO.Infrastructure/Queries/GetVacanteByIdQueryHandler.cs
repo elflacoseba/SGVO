@@ -24,11 +24,11 @@ public class GetVacanteByIdQueryHandler : IQueryHandler<GetVacanteByIdQuery, Vac
     {
         var vacante = await _dbContext.Vacantes
             .AsNoTracking()
-            .Where(v => v.Id == (ulong)request.Id && v.EliminadoEn == null && v.EliminadoPor == null)
+            .Where(v => v.Id == request.Id && v.EliminadoEn == null)
             .Select(v => new VacanteDto
             {
-                Id = (long)v.Id,
-                PuestoId = (long)v.PuestoId,
+                Id = v.Id,
+                PuestoId = v.PuestoId,
                 FechaApertura = v.FechaApertura,
                 FechaCierre = v.FechaCierre,
                 Motivo = v.Motivo,

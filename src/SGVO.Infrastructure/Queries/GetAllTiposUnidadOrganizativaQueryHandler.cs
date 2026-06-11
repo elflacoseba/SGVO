@@ -27,7 +27,7 @@ public class GetAllTiposUnidadOrganizativaQueryHandler : IQueryHandler<GetAllTip
 
         var query = _dbContext.TiposUnidadOrganizativa
             .AsNoTracking()
-            .Where(e => e.EliminadoEn == null && e.EliminadoPor == null);
+            .Where(e => e.EliminadoEn == null);
 
         var totalCount = await query.CountAsync(cancellationToken);
         var totalPages = (int)Math.Ceiling(totalCount / (double)normalized.PageSize);
@@ -38,9 +38,9 @@ public class GetAllTiposUnidadOrganizativaQueryHandler : IQueryHandler<GetAllTip
             .Take(normalized.PageSize)
             .Select(e => new TipoUnidadOrganizativaDto
             {
-                Id = (long)e.Id,
+                Id = e.Id,
                 Nombre = e.Nombre,
-                Activo = e.Activo ?? false,
+                Activo = e.Activo,
                 CreadoEn = e.CreadoEn,
                 ModificadoEn = e.ModificadoEn
             })
