@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SGVO.Domain.Entities;
 using SGVO.Infrastructure.Persistence.Entities;
 
 namespace SGVO.Infrastructure.Persistence.Configurations;
@@ -38,8 +39,9 @@ public class PuestoConfiguration : IEntityTypeConfiguration<PuestoEntity>
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("FK_Puestos_EliminadoPor");
 
+        // Cargo is a domain entity without navigation collections
         builder.HasOne(e => e.Cargo)
-            .WithMany(c => c.Puestos)
+            .WithMany()
             .HasForeignKey(e => e.CargoId)
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("FK_Puestos_Cargo");

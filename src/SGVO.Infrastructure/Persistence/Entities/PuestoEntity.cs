@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using SGVO.Domain.Entities;
 
 namespace SGVO.Infrastructure.Persistence.Entities;
 
@@ -21,7 +22,7 @@ public class PuestoEntity
 
     // Navigation properties
     public virtual UsuarioEntity? EliminadoPorNavigation { get; set; }
-    public virtual CargoEntity? Cargo { get; set; }
+    public virtual Cargo? Cargo { get; set; }
     public virtual UnidadesOrganizativaEntity? UnidadOrganizativa { get; set; }
     public virtual PuestoEntity? Superior { get; set; }
     public virtual ICollection<PuestoEntity> InverseSuperior { get; set; } = new List<PuestoEntity>();

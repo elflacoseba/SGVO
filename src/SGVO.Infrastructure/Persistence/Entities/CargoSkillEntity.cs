@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using SGVO.Domain.Entities;
 
 namespace SGVO.Infrastructure.Persistence.Entities;
 
@@ -16,7 +17,7 @@ public class CargoSkillEntity
     public long? EliminadoPor { get; set; }
 
     // Navigation properties
-    public virtual CargoEntity Cargo { get; set; } = null!;
+    public virtual Cargo Cargo { get; set; } = null!;
     public virtual SkillEntity Skill { get; set; } = null!;
     public virtual UsuarioEntity? EliminadoPorNavigation { get; set; }
 }

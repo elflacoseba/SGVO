@@ -7,7 +7,7 @@ using SGVO.Shared;
 namespace SGVO.Infrastructure.Queries;
 
 /// <summary>
-/// Handler para GetAllCargosQuery. Retorna cargos paginados excluyendo soft-deleted.
+/// Handler for GetAllCargosQuery. Returns paginated active cargos excluding soft-deleted.
 /// </summary>
 public class GetAllCargosQueryHandler : IQueryHandler<GetAllCargosQuery, PagedResult<CargoDto>>
 {
@@ -26,7 +26,7 @@ public class GetAllCargosQueryHandler : IQueryHandler<GetAllCargosQuery, PagedRe
 
         var query = _dbContext.Cargos
             .AsNoTracking()
-            .Where(c => c.EliminadoEn == null && c.EliminadoPor == null);
+            .Where(c => c.EliminadoEn == null);
 
         var totalCount = await query.CountAsync(cancellationToken);
         var totalPages = (int)Math.Ceiling(totalCount / (double)normalized.PageSize);
@@ -37,7 +37,7 @@ public class GetAllCargosQueryHandler : IQueryHandler<GetAllCargosQuery, PagedRe
             .Take(normalized.PageSize)
             .Select(c => new CargoDto
             {
-                Id = (long)c.Id,
+                Id = c.Id,
                 Nombre = c.Nombre,
                 Descripcion = c.Descripcion
             })

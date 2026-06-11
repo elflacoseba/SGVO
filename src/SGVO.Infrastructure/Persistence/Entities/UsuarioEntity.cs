@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using SGVO.Domain.Entities;
 
 namespace SGVO.Infrastructure.Persistence.Entities;
 
@@ -23,7 +24,7 @@ public class UsuarioEntity
     public virtual UsuarioEntity? EliminadoPorNavigation { get; set; }
     public virtual ICollection<UsuarioEntity> InverseEliminadoPorNavigation { get; set; } = new List<UsuarioEntity>();
     public virtual ICollection<AuditoriaEntity> Auditoria { get; set; } = new List<AuditoriaEntity>();
-    public virtual ICollection<CargoEntity> Cargos { get; set; } = new List<CargoEntity>();
+    public virtual ICollection<Cargo> Cargos { get; set; } = new List<Cargo>();
     public virtual ICollection<CargoSkillEntity> CargoSkills { get; set; } = new List<CargoSkillEntity>();
     public virtual ICollection<OcupacioneEntity> Ocupaciones { get; set; } = new List<OcupacioneEntity>();
     public virtual ICollection<PersonaEntity> Personas { get; set; } = new List<PersonaEntity>();

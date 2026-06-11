@@ -7,7 +7,9 @@ using SGVO.Application.Features.Auth.Commands;
 using SGVO.Application.Features.Auth.Dtos;
 using SGVO.Application.Features.Auth.Queries;
 using SGVO.Shared;
+using SGVO.Application.Features.Cargos.Commands;
 using SGVO.Application.Features.Cargos.Queries;
+using SGVO.Domain.Entities;
 using SGVO.Application.Features.Postulantes.Queries;
 using SGVO.Application.Features.Skills.Queries;
 using SGVO.Application.Features.TiposUnidadOrganizativa.Commands;
@@ -48,6 +50,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IQueryHandler<GetAllVacantesQuery, PagedResult<VacanteDto>>, GetAllVacantesQueryHandler>();
         services.AddScoped<IQueryHandler<GetVacanteByIdQuery, VacanteDto?>, GetVacanteByIdQueryHandler>();
         services.AddScoped<IQueryHandler<GetAllCargosQuery, PagedResult<CargoDto>>, GetAllCargosQueryHandler>();
+        services.AddScoped<IQueryHandler<GetCargoByIdQuery, CargoDetailDto?>, GetCargoByIdQueryHandler>();
+
+        // Cargo command handlers
+        services.AddScoped<ICommandHandler<CrearCargoCommand, CargoDetailDto>, CrearCargoCommandHandler>();
+        services.AddScoped<ICommandHandler<ActualizarCargoCommand, CargoDetailDto>, ActualizarCargoCommandHandler>();
+        services.AddScoped<ICommandHandler<EliminarCargoCommand, Unit>, EliminarCargoCommandHandler>();
+        services.AddScoped<ICommandHandler<ReactivarCargoCommand, CargoDetailDto>, ReactivarCargoCommandHandler>();
         services.AddScoped<IQueryHandler<GetAllPostulantesQuery, PagedResult<PostulanteDto>>, GetAllPostulantesQueryHandler>();
         services.AddScoped<IQueryHandler<GetAllSkillsQuery, PagedResult<SkillDto>>, GetAllSkillsQueryHandler>();
         services.AddScoped<IQueryHandler<GetCurrentUserQuery, UserDto?>, GetCurrentUserQueryHandler>();
