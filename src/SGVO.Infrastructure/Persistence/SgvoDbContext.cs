@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SGVO.Domain.Entities;
 using SGVO.Infrastructure.Persistence.Entities;
 
 namespace SGVO.Infrastructure.Persistence;
@@ -15,7 +16,7 @@ public class SgvoDbContext : DbContext
 
     // DbSets para todas las entidades
     public DbSet<AuditoriaEntity> Auditorias { get; set; }
-    public DbSet<CargoEntity> Cargos { get; set; }
+    public DbSet<Cargo> Cargos { get; set; }
     public DbSet<CargoSkillEntity> CargoSkills { get; set; }
     public DbSet<OcupacioneEntity> Ocupaciones { get; set; }
     public DbSet<PersonaEntity> Personas { get; set; }

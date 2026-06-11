@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SGVO.Domain.Entities;
 using SGVO.Infrastructure.Persistence.Entities;
 
 namespace SGVO.Infrastructure.Persistence.Configurations;
@@ -21,9 +22,10 @@ public class CargoSkillConfiguration : IEntityTypeConfiguration<CargoSkillEntity
         builder.Property(e => e.Activo)
             .HasDefaultValue(true);
 
-        // Relationships
+        // Relationships — Cargo is a domain entity without navigation collections,
+        // so we configure the relationship from the CargoSkill side only.
         builder.HasOne(e => e.Cargo)
-            .WithMany(c => c.CargoSkills)
+            .WithMany()
             .HasForeignKey(e => e.CargoId)
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("FK_CargoSkills_Cargo");

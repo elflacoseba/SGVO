@@ -3,7 +3,7 @@ namespace SGVO.Domain.Entities;
 /// <summary>
 /// Representa un cargo o posición dentro de la organización.
 /// </summary>
-public class Cargo
+public class Cargo : IEntity
 {
     public long Id { get; private set; }
     public string Nombre { get; private set; } = null!;
