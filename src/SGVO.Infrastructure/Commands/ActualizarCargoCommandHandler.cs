@@ -44,16 +44,6 @@ public class ActualizarCargoCommandHandler : ICommandHandler<ActualizarCargoComm
         _repository.Update(cargo);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result<CargoDetailDto>.Success(MapToDto(cargo));
+        return Result<CargoDetailDto>.Success(CargoDetailDto.FromEntity(cargo));
     }
-
-    private static CargoDetailDto MapToDto(Cargo cargo) => new()
-    {
-        Id = cargo.Id,
-        Nombre = cargo.Nombre,
-        Descripcion = cargo.Descripcion,
-        Activo = cargo.Activo,
-        CreadoEn = cargo.CreadoEn,
-        ModificadoEn = cargo.ModificadoEn
-    };
 }
