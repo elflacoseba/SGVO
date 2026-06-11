@@ -19,10 +19,8 @@ public class UnidadesOrganizativaConfiguration : IEntityTypeConfiguration<Unidad
             .IsRequired()
             .HasMaxLength(200);
 
-        builder.Property(e => e.Tipo)
-            .IsRequired()
-            .HasMaxLength(50)
-            .HasComment("Facultad, Secretaría, Dirección, Departamento, División, Área");
+        builder.Property(e => e.TipoUnidadOrganizativaId)
+            .IsRequired();
 
         builder.Property(e => e.NivelJerarquico)
             .HasDefaultValue(1);
@@ -37,6 +35,12 @@ public class UnidadesOrganizativaConfiguration : IEntityTypeConfiguration<Unidad
             .ValueGeneratedOnAddOrUpdate();
 
         // Relationships
+        builder.HasOne(e => e.TipoUnidadOrganizativa)
+            .WithMany(t => t.UnidadesOrganizativas)
+            .HasForeignKey(e => e.TipoUnidadOrganizativaId)
+            .OnDelete(DeleteBehavior.ClientSetNull)
+            .HasConstraintName("FK_UnidadesOrganizativas_Tipo");
+
         builder.HasOne(e => e.EliminadoPorNavigation)
             .WithMany(u => u.UnidadesOrganizativas)
             .HasForeignKey(e => e.EliminadoPor)

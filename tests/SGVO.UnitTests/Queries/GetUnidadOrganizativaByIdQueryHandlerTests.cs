@@ -14,11 +14,14 @@ public class GetUnidadOrganizativaByIdQueryHandlerTests
     {
         // Arrange
         var dbContext = InMemoryDbContextFactory.Create();
+        dbContext.TiposUnidadOrganizativa.Add(
+            new TipoUnidadOrganizativaEntity { Id = 1, Nombre = "Facultad", Activo = true, CreadoEn = DateTime.UtcNow }
+        );
         dbContext.UnidadesOrganizativas.Add(new UnidadesOrganizativaEntity
         {
             Id = 1,
             Nombre = "Facultad de Ciencias",
-            Tipo = "Facultad",
+            TipoUnidadOrganizativaId = 1,
             NivelJerarquico = 1,
             Activo = true,
             CreadoEn = DateTime.UtcNow
@@ -36,7 +39,7 @@ public class GetUnidadOrganizativaByIdQueryHandlerTests
         Assert.NotNull(result.Value);
         Assert.Equal(1, result.Value.Id);
         Assert.Equal("Facultad de Ciencias", result.Value.Nombre);
-        Assert.Equal("Facultad", result.Value.Tipo);
+        Assert.Equal("Facultad", result.Value.TipoNombre);
     }
 
     [Fact]
@@ -60,11 +63,14 @@ public class GetUnidadOrganizativaByIdQueryHandlerTests
     {
         // Arrange
         var dbContext = InMemoryDbContextFactory.Create();
+        dbContext.TiposUnidadOrganizativa.Add(
+            new TipoUnidadOrganizativaEntity { Id = 1, Nombre = "Facultad", Activo = true, CreadoEn = DateTime.UtcNow }
+        );
         dbContext.UnidadesOrganizativas.Add(new UnidadesOrganizativaEntity
         {
             Id = 1,
             Nombre = "Eliminada",
-            Tipo = "Facultad",
+            TipoUnidadOrganizativaId = 1,
             Activo = false,
             EliminadoEn = DateTime.UtcNow,
             EliminadoPor = 1,

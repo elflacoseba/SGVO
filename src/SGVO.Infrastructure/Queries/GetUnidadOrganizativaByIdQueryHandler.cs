@@ -24,6 +24,7 @@ public class GetUnidadOrganizativaByIdQueryHandler : IQueryHandler<GetUnidadOrga
     {
         var entity = await _dbContext.UnidadesOrganizativas
             .AsNoTracking()
+            .Include(e => e.TipoUnidadOrganizativa)
             .Where(e => e.Id == (ulong)request.Id && e.EliminadoEn == null && e.EliminadoPor == null)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -51,7 +52,8 @@ public class GetUnidadOrganizativaByIdQueryHandler : IQueryHandler<GetUnidadOrga
         {
             Id = (long)entity.Id,
             Nombre = entity.Nombre,
-            Tipo = entity.Tipo,
+            TipoUnidadOrganizativaId = (long)entity.TipoUnidadOrganizativaId,
+            TipoNombre = entity.TipoUnidadOrganizativa?.Nombre ?? string.Empty,
             NivelJerarquico = entity.NivelJerarquico,
             PadreId = entity.PadreId != null ? (long)entity.PadreId : null,
             Activo = entity.Activo ?? false,

@@ -26,6 +26,7 @@ public class GetUnidadesOrganizativasTreeQueryHandler : IQueryHandler<GetUnidade
         // Fetch all active units flat from DB — avoids N+1
         var flat = await _dbContext.UnidadesOrganizativas
             .AsNoTracking()
+            .Include(e => e.TipoUnidadOrganizativa)
             .Where(e => e.EliminadoEn == null && e.EliminadoPor == null)
             .OrderBy(e => e.NivelJerarquico)
             .ThenBy(e => e.Id)
@@ -33,7 +34,8 @@ public class GetUnidadesOrganizativasTreeQueryHandler : IQueryHandler<GetUnidade
             {
                 Id = (long)e.Id,
                 Nombre = e.Nombre,
-                Tipo = e.Tipo,
+                TipoUnidadOrganizativaId = (long)e.TipoUnidadOrganizativaId,
+                TipoNombre = e.TipoUnidadOrganizativa != null ? e.TipoUnidadOrganizativa.Nombre : string.Empty,
                 NivelJerarquico = e.NivelJerarquico,
                 PadreId = e.PadreId != null ? (long)e.PadreId : null,
                 Activo = e.Activo ?? false

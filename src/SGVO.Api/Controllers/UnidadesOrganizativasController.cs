@@ -30,11 +30,11 @@ public class UnidadesOrganizativasController : ControllerBase
     public async Task<IActionResult> GetAll(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
-        [FromQuery] string? tipo = null,
+        [FromQuery] long? tipoUnidadOrganizativaId = null,
         CancellationToken ct = default)
     {
         var pagination = new PageParameters(page, pageSize);
-        var result = await _getAll.Handle(new GetAllUnidadesOrganizativasQuery(pagination, tipo), ct);
+        var result = await _getAll.Handle(new GetAllUnidadesOrganizativasQuery(pagination, tipoUnidadOrganizativaId), ct);
 
         if (result.IsFailure)
             return result.ToErrorActionResult();
