@@ -13,6 +13,7 @@ using SGVO.Application.Features.Skills.Queries;
 using SGVO.Application.Features.TiposUnidadOrganizativa.Commands;
 using SGVO.Application.Features.TiposUnidadOrganizativa.Dtos;
 using SGVO.Application.Features.TiposUnidadOrganizativa.Queries;
+using SGVO.Application.Features.UnidadesOrganizativas.Commands;
 using SGVO.Application.Features.UnidadesOrganizativas.Queries;
 using SGVO.Application.Features.Vacantes.Queries;
 using SGVO.Domain.Interfaces;
@@ -70,6 +71,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICommandHandler<ActualizarTipoUnidadOrganizativaCommand, TipoUnidadOrganizativaDto>, ActualizarTipoUnidadOrganizativaCommandHandler>();
         services.AddScoped<ICommandHandler<EliminarTipoUnidadOrganizativaCommand, Unit>, EliminarTipoUnidadOrganizativaCommandHandler>();
         services.AddScoped<ICommandHandler<ReactivarTipoUnidadOrganizativaCommand, TipoUnidadOrganizativaDto>, ReactivarTipoUnidadOrganizativaCommandHandler>();
+
+        // UnidadesOrganizativas command handlers
+        services.AddScoped<ICommandHandler<CrearUnidadOrganizativaCommand, UnidadOrganizativaDetailDto>, CrearUnidadOrganizativaCommandHandler>();
+        services.AddScoped<ICommandHandler<ActualizarUnidadOrganizativaCommand, UnidadOrganizativaDetailDto>, ActualizarUnidadOrganizativaCommandHandler>();
+        services.AddScoped<ICommandHandler<EliminarUnidadOrganizativaCommand, Unit>, EliminarUnidadOrganizativaCommandHandler>();
+        services.AddScoped<ICommandHandler<ReactivarUnidadOrganizativaCommand, UnidadOrganizativaDetailDto>, ReactivarUnidadOrganizativaCommandHandler>();
 
         return services;
     }
