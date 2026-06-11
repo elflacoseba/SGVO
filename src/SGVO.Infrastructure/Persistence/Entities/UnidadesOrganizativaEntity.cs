@@ -9,7 +9,7 @@ public class UnidadesOrganizativaEntity
 {
     public ulong Id { get; set; }
     public string Nombre { get; set; } = null!;
-    public string Tipo { get; set; } = null!;
+    public ulong TipoUnidadOrganizativaId { get; set; }
     public int? NivelJerarquico { get; set; }
     public ulong? PadreId { get; set; }
     public bool? Activo { get; set; }
@@ -19,6 +19,7 @@ public class UnidadesOrganizativaEntity
     public ulong? EliminadoPor { get; set; }
 
     // Navigation properties
+    public virtual TipoUnidadOrganizativaEntity? TipoUnidadOrganizativa { get; set; }
     public virtual UsuarioEntity? EliminadoPorNavigation { get; set; }
     public virtual UnidadesOrganizativaEntity? Padre { get; set; }
     public virtual ICollection<UnidadesOrganizativaEntity> InversePadre { get; set; } = new List<UnidadesOrganizativaEntity>();
