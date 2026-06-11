@@ -5,19 +5,19 @@ namespace SGVO.Domain.Entities;
 /// </summary>
 public class Vacante
 {
-    public ulong Id { get; private set; }
-    public ulong PuestoId { get; private set; }
+    public long Id { get; private set; }
+    public long PuestoId { get; private set; }
     public DateTime FechaApertura { get; private set; }
     public DateTime? FechaCierre { get; private set; }
     public string Motivo { get; private set; } = null!;
     public string Estado { get; private set; } = null!;
     public string? Observaciones { get; private set; }
-    public ulong? ResponsableId { get; private set; }
+    public long? ResponsableId { get; private set; }
     public bool Activo { get; private set; }
     public DateTime CreadoEn { get; private set; }
     public DateTime? ModificadoEn { get; private set; }
     public DateTime? EliminadoEn { get; private set; }
-    public ulong? EliminadoPor { get; private set; }
+    public long? EliminadoPor { get; private set; }
 
     // Constructor privado para EF Core
     private Vacante() { }
@@ -25,7 +25,7 @@ public class Vacante
     /// <summary>
     /// Constructor para crear una nueva vacante.
     /// </summary>
-    public Vacante(ulong puestoId, string motivo, string estado = "Abierta", ulong? responsableId = null)
+    public Vacante(long puestoId, string motivo, string estado = "Abierta", long? responsableId = null)
     {
         if (puestoId == 0)
             throw new ArgumentException("El ID del puesto es obligatorio.", nameof(puestoId));
@@ -86,7 +86,7 @@ public class Vacante
     /// <summary>
     /// Marca la vacante como eliminada (soft delete).
     /// </summary>
-    public void Eliminar(ulong eliminadoPor)
+    public void Eliminar(long eliminadoPor)
     {
         EliminadoEn = DateTime.UtcNow;
         EliminadoPor = eliminadoPor;

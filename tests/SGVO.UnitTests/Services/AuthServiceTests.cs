@@ -35,8 +35,8 @@ public class AuthServiceTests
         _configMock = new Mock<IConfiguration>();
 
         _tokenServiceMock
-            .Setup(t => t.GenerateAccessToken(It.IsAny<ulong>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()))
-            .Returns((ulong id, string user, IEnumerable<string> roles) =>
+            .Setup(t => t.GenerateAccessToken(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()))
+            .Returns((long id, string user, IEnumerable<string> roles) =>
                 ("fake-jwt-token-for-user-" + id, DateTime.UtcNow.AddMinutes(15)));
 
         _passwordHasherMock
@@ -154,7 +154,7 @@ public class AuthServiceTests
         var result = await _authService.GetUserByIdAsync(1);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.Id.Should().Be(1UL);
+        result.Value.Id.Should().Be(1L);
         result.Value.Username.Should().Be("testuser");
     }
 

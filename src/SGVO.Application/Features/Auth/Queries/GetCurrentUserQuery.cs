@@ -6,4 +6,4 @@ namespace SGVO.Application.Features.Auth.Queries;
 /// <summary>
 /// Consulta para obtener la información del usuario autenticado actual.
 /// </summary>
-public sealed record GetCurrentUserQuery(ulong UserId) : IQuery<UserDto?>;
+public sealed record GetCurrentUserQuery(long UserId) : IQuery<UserDto?>;

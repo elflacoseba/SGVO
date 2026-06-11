@@ -44,7 +44,7 @@ public class EliminarUnidadOrganizativaCommandHandlerTests
         var entity = dbContext.UnidadesOrganizativas.First(e => e.Id == 1);
         Assert.False(entity.Activo);
         Assert.NotNull(entity.EliminadoEn);
-        Assert.Equal((ulong)42, entity.EliminadoPor);
+        Assert.Equal(42L, entity.EliminadoPor);
     }
 
     [Fact]

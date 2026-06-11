@@ -13,12 +13,12 @@ public static class ClaimsPrincipalExtensions
     /// </summary>
     /// <param name="principal">The claims principal.</param>
     /// <returns>User ID if found; null otherwise.</returns>
-    public static ulong? GetUserId(this ClaimsPrincipal principal)
+    public static long? GetUserId(this ClaimsPrincipal principal)
     {
         var userIdClaim = principal.FindFirst("uid")?.Value
             ?? principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        if (ulong.TryParse(userIdClaim, out var userId))
+        if (long.TryParse(userIdClaim, out var userId))
             return userId;
 
         return null;

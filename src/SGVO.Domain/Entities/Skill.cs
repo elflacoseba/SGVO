@@ -5,14 +5,14 @@ namespace SGVO.Domain.Entities;
 /// </summary>
 public class Skill
 {
-    public ulong Id { get; private set; }
+    public long Id { get; private set; }
     public string Nombre { get; private set; } = null!;
     public string? Categoria { get; private set; }
     public string? Descripcion { get; private set; }
     public bool Activo { get; private set; }
     public DateTime CreadoEn { get; private set; }
     public DateTime? EliminadoEn { get; private set; }
-    public ulong? EliminadoPor { get; private set; }
+    public long? EliminadoPor { get; private set; }
 
     // Constructor privado para EF Core
     private Skill() { }
@@ -66,7 +66,7 @@ public class Skill
     /// <summary>
     /// Marca el skill como eliminado (soft delete).
     /// </summary>
-    public void Eliminar(ulong eliminadoPor)
+    public void Eliminar(long eliminadoPor)
     {
         EliminadoEn = DateTime.UtcNow;
         EliminadoPor = eliminadoPor;

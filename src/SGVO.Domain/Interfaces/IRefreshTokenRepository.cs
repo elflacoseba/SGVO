@@ -35,7 +35,7 @@ public interface IRefreshTokenRepository
     /// <param name="cancellationToken">Token de cancelación.</param>
     /// <returns>Tarea completada.</returns>
     Task RevokeAsync(
-        ulong tokenId,
+        long tokenId,
         string reason,
         CancellationToken cancellationToken = default);
 
@@ -58,6 +58,6 @@ public interface IRefreshTokenRepository
     /// <param name="cancellationToken">Token de cancelación.</param>
     /// <returns>Lista de refresh tokens activos.</returns>
     Task<IReadOnlyList<RefreshToken>> GetActiveByUserIdAsync(
-        ulong userId,
+        long userId,
         CancellationToken cancellationToken = default);
 }

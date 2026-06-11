@@ -5,14 +5,14 @@ namespace SGVO.Domain.Entities;
 /// </summary>
 public class Cargo
 {
-    public ulong Id { get; private set; }
+    public long Id { get; private set; }
     public string Nombre { get; private set; } = null!;
     public string? Descripcion { get; private set; }
     public bool Activo { get; private set; }
     public DateTime CreadoEn { get; private set; }
     public DateTime? ModificadoEn { get; private set; }
     public DateTime? EliminadoEn { get; private set; }
-    public ulong? EliminadoPor { get; private set; }
+    public long? EliminadoPor { get; private set; }
 
     // Constructor privado para EF Core
     private Cargo() { }
@@ -59,7 +59,7 @@ public class Cargo
     /// <summary>
     /// Marca el cargo como eliminado (soft delete).
     /// </summary>
-    public void Eliminar(ulong eliminadoPor)
+    public void Eliminar(long eliminadoPor)
     {
         EliminadoEn = DateTime.UtcNow;
         EliminadoPor = eliminadoPor;

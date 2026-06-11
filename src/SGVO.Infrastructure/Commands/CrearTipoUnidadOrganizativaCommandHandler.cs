@@ -45,9 +45,9 @@ public class CrearTipoUnidadOrganizativaCommandHandler : ICommandHandler<CrearTi
 
         return Result<TipoUnidadOrganizativaDto>.Success(new TipoUnidadOrganizativaDto
         {
-            Id = (long)entity.Id,
+            Id = entity.Id,
             Nombre = entity.Nombre,
-            Activo = entity.Activo ?? true,
+            Activo = entity.Activo,
             CreadoEn = entity.CreadoEn,
             ModificadoEn = entity.ModificadoEn
         });

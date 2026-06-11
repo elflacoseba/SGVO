@@ -13,7 +13,7 @@ public interface ITokenService
     /// <param name="roles">Roles asignados al usuario.</param>
     /// <returns>Tuple con el token JWT y su fecha de expiración en UTC.</returns>
     (string Token, DateTime ExpiresAt) GenerateAccessToken(
-        ulong userId,
+        long userId,
         string username,
         IEnumerable<string> roles);
 
@@ -22,5 +22,5 @@ public interface ITokenService
     /// </summary>
     /// <param name="token">Token JWT a validar.</param>
     /// <returns>Identificador del usuario si el token es válido; null en caso contrario.</returns>
-    ulong? ValidateToken(string token);
+    long? ValidateToken(string token);
 }

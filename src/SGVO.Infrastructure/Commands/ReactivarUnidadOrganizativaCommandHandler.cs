@@ -25,7 +25,7 @@ public class ReactivarUnidadOrganizativaCommandHandler : ICommandHandler<Reactiv
         CancellationToken cancellationToken)
     {
         var entity = await _dbContext.UnidadesOrganizativas
-            .FirstOrDefaultAsync(e => e.Id == (ulong)command.Id, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == command.Id, cancellationToken);
 
         if (entity is null)
             return Result<UnidadOrganizativaDetailDto>.Failure(
@@ -85,17 +85,17 @@ public class ReactivarUnidadOrganizativaCommandHandler : ICommandHandler<Reactiv
 
         return Result<UnidadOrganizativaDetailDto>.Success(new UnidadOrganizativaDetailDto
         {
-            Id = (long)entity.Id,
+            Id = entity.Id,
             Nombre = entity.Nombre,
-            TipoUnidadOrganizativaId = (long)entity.TipoUnidadOrganizativaId,
+            TipoUnidadOrganizativaId = entity.TipoUnidadOrganizativaId,
             TipoNombre = tipo.Nombre,
             NivelJerarquico = entity.NivelJerarquico,
-            PadreId = entity.PadreId.HasValue ? (long)entity.PadreId.Value : null,
-            Activo = entity.Activo ?? true,
+            PadreId = entity.PadreId,
+            Activo = entity.Activo,
             CreadoEn = entity.CreadoEn,
             ModificadoEn = entity.ModificadoEn,
             Padre = entity.PadreId.HasValue && padreNombre is not null
-                ? new UnidadOrganizativaParentDto { Id = (long)entity.PadreId.Value, Nombre = padreNombre }
+                ? new UnidadOrganizativaParentDto { Id = entity.PadreId.Value, Nombre = padreNombre }
                 : null,
             ChildrenCount = childrenCount
         });

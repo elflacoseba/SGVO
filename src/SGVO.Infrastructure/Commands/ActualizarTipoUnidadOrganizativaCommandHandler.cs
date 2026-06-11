@@ -24,7 +24,7 @@ public class ActualizarTipoUnidadOrganizativaCommandHandler : ICommandHandler<Ac
         CancellationToken cancellationToken)
     {
         var entity = await _dbContext.TiposUnidadOrganizativa
-            .FirstOrDefaultAsync(e => e.Id == (ulong)command.Id, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == command.Id, cancellationToken);
 
         if (entity is null)
             return Result<TipoUnidadOrganizativaDto>.Failure(
@@ -52,9 +52,9 @@ public class ActualizarTipoUnidadOrganizativaCommandHandler : ICommandHandler<Ac
 
         return Result<TipoUnidadOrganizativaDto>.Success(new TipoUnidadOrganizativaDto
         {
-            Id = (long)entity.Id,
+            Id = entity.Id,
             Nombre = entity.Nombre,
-            Activo = entity.Activo ?? true,
+            Activo = entity.Activo,
             CreadoEn = entity.CreadoEn,
             ModificadoEn = entity.ModificadoEn
         });

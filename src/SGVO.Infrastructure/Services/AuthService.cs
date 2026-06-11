@@ -136,7 +136,7 @@ public class AuthService : IAuthService
     }
 
     public async Task<Result> LogoutAsync(
-        ulong userId,
+        long userId,
         string refreshToken,
         CancellationToken cancellationToken = default)
     {
@@ -159,8 +159,8 @@ public class AuthService : IAuthService
         return Result.Success();
     }
 
-    public async Task<Result<(ulong Id, string Username, string Email, IEnumerable<string> Roles)>> GetUserByIdAsync(
-        ulong userId,
+    public async Task<Result<(long Id, string Username, string Email, IEnumerable<string> Roles)>> GetUserByIdAsync(
+        long userId,
         CancellationToken cancellationToken = default)
     {
         var usuario = await _dbContext.Usuarios
@@ -171,14 +171,14 @@ public class AuthService : IAuthService
                 cancellationToken);
 
         if (usuario is null)
-            return Result<(ulong, string, string, IEnumerable<string>)>.Failure("Usuario no encontrado.", "NOT_FOUND");
+            return Result<(long, string, string, IEnumerable<string>)>.Failure("Usuario no encontrado.", "NOT_FOUND");
 
         var roles = usuario.Roles
             .Where(r => r.Activo == true)
             .Select(r => r.Nombre)
             .ToList();
 
-        return Result<(ulong, string, string, IEnumerable<string>)>.Success(
+        return Result<(long, string, string, IEnumerable<string>)>.Success(
             (usuario.Id, usuario.NombreUsuario, usuario.Email ?? string.Empty, roles));
     }
 

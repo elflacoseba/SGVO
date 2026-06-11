@@ -37,7 +37,7 @@ public interface IAuthService
     /// <param name="cancellationToken">Token de cancelación.</param>
     /// <returns>Resultado de la operación.</returns>
     Task<Result> LogoutAsync(
-        ulong userId,
+        long userId,
         string refreshToken,
         CancellationToken cancellationToken = default);
 
@@ -47,7 +47,7 @@ public interface IAuthService
     /// <param name="userId">Identificador del usuario.</param>
     /// <param name="cancellationToken">Token de cancelación.</param>
     /// <returns>Resultado con el usuario si existe; fallo si no se encuentra.</returns>
-    Task<Result<(ulong Id, string Username, string Email, IEnumerable<string> Roles)>> GetUserByIdAsync(
-        ulong userId,
+    Task<Result<(long Id, string Username, string Email, IEnumerable<string> Roles)>> GetUserByIdAsync(
+        long userId,
         CancellationToken cancellationToken = default);
 }

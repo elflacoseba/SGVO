@@ -25,7 +25,7 @@ public class GetTipoUnidadOrganizativaByIdQueryHandler : IQueryHandler<GetTipoUn
     {
         var entity = await _dbContext.TiposUnidadOrganizativa
             .AsNoTracking()
-            .Where(e => e.Id == (ulong)request.Id && e.EliminadoEn == null && e.EliminadoPor == null)
+            .Where(e => e.Id == request.Id && e.EliminadoEn == null)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (entity is null)
@@ -33,9 +33,9 @@ public class GetTipoUnidadOrganizativaByIdQueryHandler : IQueryHandler<GetTipoUn
 
         var dto = new TipoUnidadOrganizativaDto
         {
-            Id = (long)entity.Id,
+            Id = entity.Id,
             Nombre = entity.Nombre,
-            Activo = entity.Activo ?? false,
+            Activo = entity.Activo,
             CreadoEn = entity.CreadoEn,
             ModificadoEn = entity.ModificadoEn
         };

@@ -27,18 +27,18 @@ public class GetUnidadesOrganizativasTreeQueryHandler : IQueryHandler<GetUnidade
         var flat = await _dbContext.UnidadesOrganizativas
             .AsNoTracking()
             .Include(e => e.TipoUnidadOrganizativa)
-            .Where(e => e.EliminadoEn == null && e.EliminadoPor == null)
+            .Where(e => e.EliminadoEn == null)
             .OrderBy(e => e.NivelJerarquico)
             .ThenBy(e => e.Id)
             .Select(e => new UnidadOrganizativaTreeDto
             {
-                Id = (long)e.Id,
+                Id = e.Id,
                 Nombre = e.Nombre,
-                TipoUnidadOrganizativaId = (long)e.TipoUnidadOrganizativaId,
+                TipoUnidadOrganizativaId = e.TipoUnidadOrganizativaId,
                 TipoNombre = e.TipoUnidadOrganizativa != null ? e.TipoUnidadOrganizativa.Nombre : string.Empty,
                 NivelJerarquico = e.NivelJerarquico,
-                PadreId = e.PadreId != null ? (long)e.PadreId : null,
-                Activo = e.Activo ?? false
+                PadreId = e.PadreId,
+                Activo = e.Activo
             })
             .ToListAsync(cancellationToken);
 

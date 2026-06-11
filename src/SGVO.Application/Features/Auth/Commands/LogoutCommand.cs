@@ -6,4 +6,4 @@ namespace SGVO.Application.Features.Auth.Commands;
 /// <summary>
 /// Comando para cerrar sesión.
 /// </summary>
-public sealed record LogoutCommand(ulong UserId, string RefreshToken) : ICommand<Unit>;
+public sealed record LogoutCommand(long UserId, string RefreshToken) : ICommand<Unit>;

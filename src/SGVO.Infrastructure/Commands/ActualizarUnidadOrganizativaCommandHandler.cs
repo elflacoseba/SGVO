@@ -25,7 +25,7 @@ public class ActualizarUnidadOrganizativaCommandHandler : ICommandHandler<Actual
         CancellationToken cancellationToken)
     {
         var entity = await _dbContext.UnidadesOrganizativas
-            .FirstOrDefaultAsync(e => e.Id == (ulong)command.Id, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == command.Id, cancellationToken);
 
         if (entity is null)
             return Result<UnidadOrganizativaDetailDto>.Failure(
@@ -39,7 +39,7 @@ public class ActualizarUnidadOrganizativaCommandHandler : ICommandHandler<Actual
 
         // Validate TipoUnidadOrganizativaId exists and is active
         var tipo = await _dbContext.TiposUnidadOrganizativa
-            .FirstOrDefaultAsync(e => e.Id == (ulong)command.TipoUnidadOrganizativaId && e.EliminadoEn == null, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == command.TipoUnidadOrganizativaId && e.EliminadoEn == null, cancellationToken);
 
         if (tipo is null)
             return Result<UnidadOrganizativaDetailDto>.Failure(
@@ -56,7 +56,7 @@ public class ActualizarUnidadOrganizativaCommandHandler : ICommandHandler<Actual
                     "CONFLICT");
 
             var padre = await _dbContext.UnidadesOrganizativas
-                .FirstOrDefaultAsync(e => e.Id == (ulong)command.PadreId.Value, cancellationToken);
+                .FirstOrDefaultAsync(e => e.Id == command.PadreId.Value, cancellationToken);
 
             if (padre is null)
                 return Result<UnidadOrganizativaDetailDto>.Failure(
@@ -71,7 +71,7 @@ public class ActualizarUnidadOrganizativaCommandHandler : ICommandHandler<Actual
             // Circular hierarchy detection: walk ancestors from proposed parent
             // If we reach command.Id, it would create a cycle
             var hasCycle = await HasCircularHierarchyAsync(
-                (ulong)command.PadreId.Value, (ulong)command.Id, cancellationToken);
+                command.PadreId.Value, command.Id, cancellationToken);
 
             if (hasCycle)
                 return Result<UnidadOrganizativaDetailDto>.Failure(
@@ -80,22 +80,22 @@ public class ActualizarUnidadOrganizativaCommandHandler : ICommandHandler<Actual
         }
 
         entity.Nombre = command.Nombre;
-        entity.TipoUnidadOrganizativaId = (ulong)command.TipoUnidadOrganizativaId;
+        entity.TipoUnidadOrganizativaId = command.TipoUnidadOrganizativaId;
         entity.NivelJerarquico = command.NivelJerarquico;
-        entity.PadreId = command.PadreId.HasValue ? (ulong)command.PadreId.Value : null;
+        entity.PadreId = command.PadreId;
         entity.ModificadoEn = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result<UnidadOrganizativaDetailDto>.Success(new UnidadOrganizativaDetailDto
         {
-            Id = (long)entity.Id,
+            Id = entity.Id,
             Nombre = entity.Nombre,
-            TipoUnidadOrganizativaId = (long)entity.TipoUnidadOrganizativaId,
+            TipoUnidadOrganizativaId = entity.TipoUnidadOrganizativaId,
             TipoNombre = tipo.Nombre,
             NivelJerarquico = entity.NivelJerarquico,
-            PadreId = entity.PadreId.HasValue ? (long)entity.PadreId.Value : null,
-            Activo = entity.Activo ?? true,
+            PadreId = entity.PadreId,
+            Activo = entity.Activo,
             CreadoEn = entity.CreadoEn,
             ModificadoEn = entity.ModificadoEn
         });
@@ -106,10 +106,10 @@ public class ActualizarUnidadOrganizativaCommandHandler : ICommandHandler<Actual
     /// Returns true if targetId is found in the chain (meaning a cycle would form).
     /// </summary>
     private async Task<bool> HasCircularHierarchyAsync(
-        ulong startAncestorId, ulong targetId, CancellationToken cancellationToken)
+        long startAncestorId, long targetId, CancellationToken cancellationToken)
     {
         var currentId = startAncestorId;
-        var visited = new HashSet<ulong>();
+        var visited = new HashSet<long>();
 
         while (currentId != 0)
         {

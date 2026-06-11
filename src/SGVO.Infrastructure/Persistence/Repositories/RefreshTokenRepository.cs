@@ -42,7 +42,7 @@ public class RefreshTokenRepository : IRefreshTokenRepository
     }
 
     public async Task RevokeAsync(
-        ulong tokenId,
+        long tokenId,
         string reason,
         CancellationToken cancellationToken = default)
     {
@@ -79,7 +79,7 @@ public class RefreshTokenRepository : IRefreshTokenRepository
     }
 
     public async Task<IReadOnlyList<RefreshToken>> GetActiveByUserIdAsync(
-        ulong userId,
+        long userId,
         CancellationToken cancellationToken = default)
     {
         var entities = await _dbContext.RefreshTokens

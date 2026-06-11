@@ -5,8 +5,8 @@ namespace SGVO.Domain.Entities;
 /// </summary>
 public class Postulante
 {
-    public ulong Id { get; private set; }
-    public ulong? PersonaId { get; private set; }
+    public long Id { get; private set; }
+    public long? PersonaId { get; private set; }
     public string Nombre { get; private set; } = null!;
     public string Apellido { get; private set; } = null!;
     public string Email { get; private set; } = null!;
@@ -16,7 +16,7 @@ public class Postulante
     public bool Activo { get; private set; }
     public DateTime CreadoEn { get; private set; }
     public DateTime? EliminadoEn { get; private set; }
-    public ulong? EliminadoPor { get; private set; }
+    public long? EliminadoPor { get; private set; }
 
     // Constructor privado para EF Core
     private Postulante() { }
@@ -24,7 +24,7 @@ public class Postulante
     /// <summary>
     /// Constructor para crear un nuevo postulante.
     /// </summary>
-    public Postulante(string nombre, string apellido, string email, string origen, ulong? personaId = null)
+    public Postulante(string nombre, string apellido, string email, string origen, long? personaId = null)
     {
         if (string.IsNullOrWhiteSpace(nombre))
             throw new ArgumentException("El nombre es obligatorio.", nameof(nombre));
@@ -98,7 +98,7 @@ public class Postulante
     /// <summary>
     /// Marca el postulante como eliminado (soft delete).
     /// </summary>
-    public void Eliminar(ulong eliminadoPor)
+    public void Eliminar(long eliminadoPor)
     {
         EliminadoEn = DateTime.UtcNow;
         EliminadoPor = eliminadoPor;

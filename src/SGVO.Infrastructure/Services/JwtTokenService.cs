@@ -30,7 +30,7 @@ public class JwtTokenService : ITokenService
     }
 
     public (string Token, DateTime ExpiresAt) GenerateAccessToken(
-        ulong userId,
+        long userId,
         string username,
         IEnumerable<string> roles)
     {
@@ -68,7 +68,7 @@ public class JwtTokenService : ITokenService
         return (new JwtSecurityTokenHandler().WriteToken(token), expiresAt);
     }
 
-    public ulong? ValidateToken(string token)
+    public long? ValidateToken(string token)
     {
         var secret = _configuration["Jwt:Secret"];
         if (string.IsNullOrEmpty(secret))
@@ -97,7 +97,7 @@ public class JwtTokenService : ITokenService
             var userIdClaim = principal.FindFirst("uid")?.Value
                 ?? principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-            if (ulong.TryParse(userIdClaim, out var userId))
+            if (long.TryParse(userIdClaim, out var userId))
                 return userId;
 
             return null;

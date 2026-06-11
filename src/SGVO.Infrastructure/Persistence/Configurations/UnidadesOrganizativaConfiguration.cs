@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SGVO.Infrastructure.Persistence.Entities;
+using SGVO.Shared;
 
 namespace SGVO.Infrastructure.Persistence.Configurations;
 
@@ -17,7 +18,7 @@ public class UnidadesOrganizativaConfiguration : IEntityTypeConfiguration<Unidad
 
         builder.Property(e => e.Nombre)
             .IsRequired()
-            .HasMaxLength(200);
+            .HasMaxLength(DomainConstants.UnidadOrganizativaNombreMaxLength);
 
         builder.Property(e => e.TipoUnidadOrganizativaId)
             .IsRequired();
@@ -33,6 +34,10 @@ public class UnidadesOrganizativaConfiguration : IEntityTypeConfiguration<Unidad
 
         builder.Property(e => e.ModificadoEn)
             .ValueGeneratedOnAddOrUpdate();
+
+        // Indexes
+        builder.HasIndex(e => e.PadreId).HasDatabaseName("IX_UnidadesOrganizativas_PadreId");
+        builder.HasIndex(e => e.NivelJerarquico).HasDatabaseName("IX_UnidadesOrganizativas_NivelJerarquico");
 
         // Relationships
         builder.HasOne(e => e.TipoUnidadOrganizativa)

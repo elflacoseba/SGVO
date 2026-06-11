@@ -7,16 +7,16 @@ namespace SGVO.Infrastructure.Persistence.Entities;
 /// </summary>
 public class UnidadesOrganizativaEntity
 {
-    public ulong Id { get; set; }
+    public long Id { get; set; }
     public string Nombre { get; set; } = null!;
-    public ulong TipoUnidadOrganizativaId { get; set; }
+    public long TipoUnidadOrganizativaId { get; set; }
     public int? NivelJerarquico { get; set; }
-    public ulong? PadreId { get; set; }
-    public bool? Activo { get; set; }
+    public long? PadreId { get; set; }
+    public bool Activo { get; set; }
     public DateTime CreadoEn { get; set; }
     public DateTime? ModificadoEn { get; set; }
     public DateTime? EliminadoEn { get; set; }
-    public ulong? EliminadoPor { get; set; }
+    public long? EliminadoPor { get; set; }
 
     // Navigation properties
     public virtual TipoUnidadOrganizativaEntity? TipoUnidadOrganizativa { get; set; }

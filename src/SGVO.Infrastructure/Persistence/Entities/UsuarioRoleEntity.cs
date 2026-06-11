@@ -7,12 +7,12 @@ namespace SGVO.Infrastructure.Persistence.Entities;
 /// </summary>
 public class UsuarioRoleEntity
 {
-    public ulong Id { get; set; }
-    public ulong UsuarioId { get; set; }
-    public ulong RolId { get; set; }
-    public bool? Activo { get; set; }
+    public long Id { get; set; }
+    public long UsuarioId { get; set; }
+    public long RolId { get; set; }
+    public bool Activo { get; set; }
     public DateTime? EliminadoEn { get; set; }
-    public ulong? EliminadoPor { get; set; }
+    public long? EliminadoPor { get; set; }
 
     // Navigation properties
     public virtual UsuarioEntity Usuario { get; set; } = null!;

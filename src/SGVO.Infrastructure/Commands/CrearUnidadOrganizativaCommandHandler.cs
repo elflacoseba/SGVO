@@ -27,7 +27,7 @@ public class CrearUnidadOrganizativaCommandHandler : ICommandHandler<CrearUnidad
     {
         // Validate TipoUnidadOrganizativaId exists and is active
         var tipo = await _dbContext.TiposUnidadOrganizativa
-            .FirstOrDefaultAsync(e => e.Id == (ulong)command.TipoUnidadOrganizativaId && e.EliminadoEn == null, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == command.TipoUnidadOrganizativaId && e.EliminadoEn == null, cancellationToken);
 
         if (tipo is null)
             return Result<UnidadOrganizativaDetailDto>.Failure(
@@ -38,7 +38,7 @@ public class CrearUnidadOrganizativaCommandHandler : ICommandHandler<CrearUnidad
         if (command.PadreId.HasValue)
         {
             var padre = await _dbContext.UnidadesOrganizativas
-                .FirstOrDefaultAsync(e => e.Id == (ulong)command.PadreId.Value, cancellationToken);
+                .FirstOrDefaultAsync(e => e.Id == command.PadreId.Value, cancellationToken);
 
             if (padre is null)
                 return Result<UnidadOrganizativaDetailDto>.Failure(
@@ -54,9 +54,9 @@ public class CrearUnidadOrganizativaCommandHandler : ICommandHandler<CrearUnidad
         var entity = new UnidadesOrganizativaEntity
         {
             Nombre = command.Nombre,
-            TipoUnidadOrganizativaId = (ulong)command.TipoUnidadOrganizativaId,
+            TipoUnidadOrganizativaId = command.TipoUnidadOrganizativaId,
             NivelJerarquico = command.NivelJerarquico,
-            PadreId = command.PadreId.HasValue ? (ulong)command.PadreId.Value : null,
+            PadreId = command.PadreId,
             Activo = true,
             CreadoEn = DateTime.UtcNow
         };
@@ -66,13 +66,13 @@ public class CrearUnidadOrganizativaCommandHandler : ICommandHandler<CrearUnidad
 
         return Result<UnidadOrganizativaDetailDto>.Success(new UnidadOrganizativaDetailDto
         {
-            Id = (long)entity.Id,
+            Id = entity.Id,
             Nombre = entity.Nombre,
-            TipoUnidadOrganizativaId = (long)entity.TipoUnidadOrganizativaId,
+            TipoUnidadOrganizativaId = entity.TipoUnidadOrganizativaId,
             TipoNombre = tipo.Nombre,
             NivelJerarquico = entity.NivelJerarquico,
-            PadreId = entity.PadreId.HasValue ? (long)entity.PadreId.Value : null,
-            Activo = entity.Activo ?? true,
+            PadreId = entity.PadreId,
+            Activo = entity.Activo,
             CreadoEn = entity.CreadoEn,
             ModificadoEn = entity.ModificadoEn,
             ChildrenCount = 0

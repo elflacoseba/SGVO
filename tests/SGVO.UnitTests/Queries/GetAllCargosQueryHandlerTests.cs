@@ -68,7 +68,7 @@ public class GetAllCargosQueryHandlerTests
         {
             dbContext.Cargos.Add(new CargoEntity
             {
-                Id = (ulong)i,
+                Id = i,
                 Nombre = $"Cargo {i}",
                 Activo = true,
                 CreadoEn = DateTime.UtcNow
