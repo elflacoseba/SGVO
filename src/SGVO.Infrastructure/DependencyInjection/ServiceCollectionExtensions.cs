@@ -10,9 +10,13 @@ using SGVO.Shared;
 using SGVO.Application.Features.Cargos.Queries;
 using SGVO.Application.Features.Postulantes.Queries;
 using SGVO.Application.Features.Skills.Queries;
+using SGVO.Application.Features.TiposUnidadOrganizativa.Commands;
+using SGVO.Application.Features.TiposUnidadOrganizativa.Dtos;
+using SGVO.Application.Features.TiposUnidadOrganizativa.Queries;
 using SGVO.Application.Features.UnidadesOrganizativas.Queries;
 using SGVO.Application.Features.Vacantes.Queries;
 using SGVO.Domain.Interfaces;
+using SGVO.Infrastructure.Commands;
 using SGVO.Infrastructure.Persistence;
 using SGVO.Infrastructure.Persistence.Repositories;
 using SGVO.Infrastructure.Queries;
@@ -52,10 +56,20 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IQueryHandler<GetUnidadOrganizativaByIdQuery, UnidadOrganizativaDetailDto?>, GetUnidadOrganizativaByIdQueryHandler>();
         services.AddScoped<IQueryHandler<GetUnidadesOrganizativasTreeQuery, IReadOnlyList<UnidadOrganizativaTreeDto>>, GetUnidadesOrganizativasTreeQueryHandler>();
 
-        // Command handlers
+        // TiposUnidadOrganizativa query handlers
+        services.AddScoped<IQueryHandler<GetAllTiposUnidadOrganizativaQuery, PagedResult<TipoUnidadOrganizativaDto>>, GetAllTiposUnidadOrganizativaQueryHandler>();
+        services.AddScoped<IQueryHandler<GetTipoUnidadOrganizativaByIdQuery, TipoUnidadOrganizativaDto?>, GetTipoUnidadOrganizativaByIdQueryHandler>();
+
+        // Auth command handlers
         services.AddScoped<ICommandHandler<LoginCommand, LoginResponseDto>, LoginCommandHandler>();
         services.AddScoped<ICommandHandler<RefreshTokenCommand, LoginResponseDto>, RefreshTokenCommandHandler>();
         services.AddScoped<ICommandHandler<LogoutCommand, Unit>, LogoutCommandHandler>();
+
+        // TiposUnidadOrganizativa command handlers
+        services.AddScoped<ICommandHandler<CrearTipoUnidadOrganizativaCommand, TipoUnidadOrganizativaDto>, CrearTipoUnidadOrganizativaCommandHandler>();
+        services.AddScoped<ICommandHandler<ActualizarTipoUnidadOrganizativaCommand, TipoUnidadOrganizativaDto>, ActualizarTipoUnidadOrganizativaCommandHandler>();
+        services.AddScoped<ICommandHandler<EliminarTipoUnidadOrganizativaCommand, Unit>, EliminarTipoUnidadOrganizativaCommandHandler>();
+        services.AddScoped<ICommandHandler<ReactivarTipoUnidadOrganizativaCommand, TipoUnidadOrganizativaDto>, ReactivarTipoUnidadOrganizativaCommandHandler>();
 
         return services;
     }
