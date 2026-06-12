@@ -1,4 +1,5 @@
 using SGVO.Application.Features.Skills.Commands;
+using SGVO.Domain.Entities;
 using SGVO.Infrastructure.Commands;
 using SGVO.Infrastructure.Persistence;
 using SGVO.Infrastructure.Persistence.Entities;
@@ -16,18 +17,12 @@ public class EliminarSkillCommandHandlerTests
     {
         // Arrange
         var dbContext = InMemoryDbContextFactory.Create();
-        var entity = new SkillEntity
-        {
-            Nombre = "Python",
-            Categoria = "Técnica",
-            Activo = true,
-            CreadoEn = DateTime.UtcNow
-        };
-        dbContext.Skills.Add(entity);
+        var skill = new Skill("Python", "Técnica");
+        dbContext.Skills.Add(skill);
         await dbContext.SaveChangesAsync();
 
         var handler = new EliminarSkillCommandHandler(dbContext);
-        var command = new EliminarSkillCommand(entity.Id, 1);
+        var command = new EliminarSkillCommand(skill.Id, 1);
 
         // Act
         var result = await handler.Handle(command, CancellationToken.None);
@@ -35,7 +30,7 @@ public class EliminarSkillCommandHandlerTests
         // Assert
         Assert.True(result.IsSuccess);
 
-        var deleted = await dbContext.Skills.FindAsync(entity.Id);
+        var deleted = await dbContext.Skills.FindAsync(skill.Id);
         Assert.NotNull(deleted);
         Assert.False(deleted!.Activo);
         Assert.NotNull(deleted.EliminadoEn);
@@ -62,20 +57,14 @@ public class EliminarSkillCommandHandlerTests
     {
         // Arrange
         var dbContext = InMemoryDbContextFactory.Create();
-        var entity = new SkillEntity
-        {
-            Nombre = "Python",
-            Categoria = "Técnica",
-            Activo = false,
-            CreadoEn = DateTime.UtcNow,
-            EliminadoEn = DateTime.UtcNow,
-            EliminadoPor = 1
-        };
-        dbContext.Skills.Add(entity);
+        var skill = new Skill("Python", "Técnica");
+        dbContext.Skills.Add(skill);
+        await dbContext.SaveChangesAsync();
+        skill.Eliminar(1);
         await dbContext.SaveChangesAsync();
 
         var handler = new EliminarSkillCommandHandler(dbContext);
-        var command = new EliminarSkillCommand(entity.Id, 1);
+        var command = new EliminarSkillCommand(skill.Id, 1);
 
         // Act
         var result = await handler.Handle(command, CancellationToken.None);
@@ -90,27 +79,21 @@ public class EliminarSkillCommandHandlerTests
     {
         // Arrange
         var dbContext = InMemoryDbContextFactory.Create();
-        var entity = new SkillEntity
-        {
-            Nombre = "Python",
-            Categoria = "Técnica",
-            Activo = true,
-            CreadoEn = DateTime.UtcNow
-        };
-        dbContext.Skills.Add(entity);
+        var skill = new Skill("Python", "Técnica");
+        dbContext.Skills.Add(skill);
         await dbContext.SaveChangesAsync();
 
         dbContext.CargoSkills.Add(new CargoSkillEntity
         {
             CargoId = 1,
-            SkillId = entity.Id,
+            SkillId = skill.Id,
             NivelImportancia = 1,
             Activo = true
         });
         await dbContext.SaveChangesAsync();
 
         var handler = new EliminarSkillCommandHandler(dbContext);
-        var command = new EliminarSkillCommand(entity.Id, 1);
+        var command = new EliminarSkillCommand(skill.Id, 1);
 
         // Act
         var result = await handler.Handle(command, CancellationToken.None);
@@ -125,27 +108,21 @@ public class EliminarSkillCommandHandlerTests
     {
         // Arrange
         var dbContext = InMemoryDbContextFactory.Create();
-        var entity = new SkillEntity
-        {
-            Nombre = "Python",
-            Categoria = "Técnica",
-            Activo = true,
-            CreadoEn = DateTime.UtcNow
-        };
-        dbContext.Skills.Add(entity);
+        var skill = new Skill("Python", "Técnica");
+        dbContext.Skills.Add(skill);
         await dbContext.SaveChangesAsync();
 
         dbContext.PersonaSkills.Add(new PersonaSkillEntity
         {
             PersonaId = 1,
-            SkillId = entity.Id,
+            SkillId = skill.Id,
             NivelDominio = 3,
             Activo = true
         });
         await dbContext.SaveChangesAsync();
 
         var handler = new EliminarSkillCommandHandler(dbContext);
-        var command = new EliminarSkillCommand(entity.Id, 1);
+        var command = new EliminarSkillCommand(skill.Id, 1);
 
         // Act
         var result = await handler.Handle(command, CancellationToken.None);

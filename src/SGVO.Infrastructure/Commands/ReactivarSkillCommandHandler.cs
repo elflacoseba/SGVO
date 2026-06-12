@@ -8,7 +8,7 @@ using SGVO.Shared;
 namespace SGVO.Infrastructure.Commands;
 
 /// <summary>
-/// Handler for ReactivarSkillCommand. Reactivates a soft-deleted skill.
+/// Handler for ReactivarSkillCommand. Reactivates a soft-deleted skill using the domain entity.
 /// Idempotent: if already active, returns the skill without changes.
 /// </summary>
 public class ReactivarSkillCommandHandler : ICommandHandler<ReactivarSkillCommand, SkillDetailDto>
@@ -24,44 +24,23 @@ public class ReactivarSkillCommandHandler : ICommandHandler<ReactivarSkillComman
         ReactivarSkillCommand command,
         CancellationToken cancellationToken)
     {
-        var entity = await _dbContext.Skills
+        var skill = await _dbContext.Skills
             .FirstOrDefaultAsync(s => s.Id == command.Id, cancellationToken);
 
-        if (entity is null)
+        if (skill is null)
             return Result<SkillDetailDto>.Failure(
                 $"Skill con id {command.Id} no encontrado.",
                 "NOT_FOUND");
 
         // Idempotent: if already active, return as-is
-        if (entity.EliminadoEn is null && entity.Activo == true)
-            return Result<SkillDetailDto>.Success(new SkillDetailDto
-            {
-                Id = entity.Id,
-                Nombre = entity.Nombre,
-                Categoria = entity.Categoria,
-                Descripcion = entity.Descripcion,
-                Activo = entity.Activo ?? false,
-                CreadoEn = entity.CreadoEn,
-                ModificadoEn = entity.ModificadoEn
-            });
+        if (skill.EliminadoEn is null && skill.Activo)
+            return Result<SkillDetailDto>.Success(SkillDetailDto.FromEntity(skill));
 
-        // Reactivate
-        entity.EliminadoEn = null;
-        entity.EliminadoPor = null;
-        entity.Activo = true;
-        entity.ModificadoEn = DateTime.UtcNow;
+        // Reactivate via domain method
+        skill.Reactivar();
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result<SkillDetailDto>.Success(new SkillDetailDto
-        {
-            Id = entity.Id,
-            Nombre = entity.Nombre,
-            Categoria = entity.Categoria,
-            Descripcion = entity.Descripcion,
-            Activo = entity.Activo ?? false,
-            CreadoEn = entity.CreadoEn,
-            ModificadoEn = entity.ModificadoEn
-        });
+        return Result<SkillDetailDto>.Success(SkillDetailDto.FromEntity(skill));
     }
 }

@@ -23,16 +23,16 @@ public class EliminarSkillCommandHandler : ICommandHandler<EliminarSkillCommand,
         EliminarSkillCommand command,
         CancellationToken cancellationToken)
     {
-        var entity = await _dbContext.Skills
+        var skill = await _dbContext.Skills
             .FirstOrDefaultAsync(s => s.Id == command.Id, cancellationToken);
 
-        if (entity is null)
+        if (skill is null)
             return Result<Unit>.Failure(
                 $"Skill con id {command.Id} no encontrado.",
                 "NOT_FOUND");
 
         // Check if already soft-deleted
-        if (entity.EliminadoEn.HasValue)
+        if (skill.EliminadoEn.HasValue)
             return Result<Unit>.Failure(
                 $"Skill con id {command.Id} ya está eliminado.",
                 "NOT_FOUND");
@@ -55,11 +55,8 @@ public class EliminarSkillCommandHandler : ICommandHandler<EliminarSkillCommand,
                 "No se puede eliminar: tiene relaciones activas con Personas.",
                 "CONFLICT");
 
-        // Apply soft delete
-        entity.EliminadoEn = DateTime.UtcNow;
-        entity.EliminadoPor = command.EliminadoPor;
-        entity.Activo = false;
-        entity.ModificadoEn = DateTime.UtcNow;
+        // Apply soft delete via domain method
+        skill.Eliminar(command.EliminadoPor);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 

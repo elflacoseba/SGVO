@@ -29,7 +29,7 @@ public class PersonaSkillConfiguration : IEntityTypeConfiguration<PersonaSkillEn
             .HasConstraintName("FK_PersonaSkills_Persona");
 
         builder.HasOne(e => e.Skill)
-            .WithMany(s => s.PersonaSkills)
+            .WithMany()
             .HasForeignKey(e => e.SkillId)
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("FK_PersonaSkills_Skill");

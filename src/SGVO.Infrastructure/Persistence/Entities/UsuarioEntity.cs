@@ -33,7 +33,7 @@ public class UsuarioEntity
     public virtual ICollection<PostulanteEntity> Postulantes { get; set; } = new List<PostulanteEntity>();
     public virtual ICollection<PuestoEntity> Puestos { get; set; } = new List<PuestoEntity>();
     public virtual ICollection<RoleEntity> Roles { get; set; } = new List<RoleEntity>();
-    public virtual ICollection<SkillEntity> Skills { get; set; } = new List<SkillEntity>();
+    public virtual ICollection<Skill> Skills { get; set; } = new List<Skill>();
     public virtual ICollection<UnidadesOrganizativaEntity> UnidadesOrganizativas { get; set; } = new List<UnidadesOrganizativaEntity>();
     public virtual ICollection<UsuarioRoleEntity> UsuarioRoleEliminadoPorNavigations { get; set; } = new List<UsuarioRoleEntity>();
     public virtual ICollection<UsuarioRoleEntity> UsuarioRoleUsuarios { get; set; } = new List<UsuarioRoleEntity>();

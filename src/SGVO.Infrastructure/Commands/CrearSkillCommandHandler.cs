@@ -9,8 +9,7 @@ using SGVO.Shared;
 namespace SGVO.Infrastructure.Commands;
 
 /// <summary>
-/// Handler for CrearSkillCommand. Creates a new skill using domain entity for validation
-/// and SkillEntity for persistence.
+/// Handler for CrearSkillCommand. Creates a new skill using the domain entity directly.
 /// </summary>
 public class CrearSkillCommandHandler : ICommandHandler<CrearSkillCommand, SkillDetailDto>
 {
@@ -25,42 +24,25 @@ public class CrearSkillCommandHandler : ICommandHandler<CrearSkillCommand, Skill
         CrearSkillCommand command,
         CancellationToken cancellationToken)
     {
-        // Check for duplicate active name
+        var trimmedNombre = command.Nombre.Trim();
+
+        // Check for duplicate active name (trimmed)
         var duplicateExists = await _dbContext.Skills
-            .AnyAsync(s => s.Nombre == command.Nombre && s.Activo == true && s.EliminadoEn == null, cancellationToken);
+            .AnyAsync(s => s.Nombre == trimmedNombre && s.Activo && s.EliminadoEn == null, cancellationToken);
 
         if (duplicateExists)
         {
             return Result<SkillDetailDto>.Failure(
-                $"Ya existe un skill activo con el nombre '{command.Nombre}'.",
+                $"Ya existe un skill activo con el nombre '{trimmedNombre}'.",
                 "CONFLICT");
         }
 
-        // Create domain entity for validation
-        var skill = new Skill(command.Nombre, command.Categoria, command.Descripcion);
+        // Create domain entity (validates and trims internally)
+        var skill = new Skill(trimmedNombre, command.Categoria?.Trim(), command.Descripcion?.Trim());
 
-        // Map to persistence entity
-        var entity = new Persistence.Entities.SkillEntity
-        {
-            Nombre = skill.Nombre,
-            Categoria = skill.Categoria,
-            Descripcion = skill.Descripcion,
-            Activo = true,
-            CreadoEn = skill.CreadoEn
-        };
-
-        _dbContext.Skills.Add(entity);
+        _dbContext.Skills.Add(skill);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result<SkillDetailDto>.Success(new SkillDetailDto
-        {
-            Id = entity.Id,
-            Nombre = entity.Nombre,
-            Categoria = entity.Categoria,
-            Descripcion = entity.Descripcion,
-            Activo = entity.Activo ?? false,
-            CreadoEn = entity.CreadoEn,
-            ModificadoEn = entity.ModificadoEn
-        });
+        return Result<SkillDetailDto>.Success(SkillDetailDto.FromEntity(skill));
     }
 }

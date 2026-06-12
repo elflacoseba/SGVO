@@ -9,8 +9,7 @@ using SGVO.Shared;
 namespace SGVO.Infrastructure.Commands;
 
 /// <summary>
-/// Handler for ActualizarSkillCommand. Updates an existing skill using domain entity
-/// for validation and SkillEntity for persistence.
+/// Handler for ActualizarSkillCommand. Updates an existing skill using the domain entity directly.
 /// </summary>
 public class ActualizarSkillCommandHandler : ICommandHandler<ActualizarSkillCommand, SkillDetailDto>
 {
@@ -25,41 +24,37 @@ public class ActualizarSkillCommandHandler : ICommandHandler<ActualizarSkillComm
         ActualizarSkillCommand command,
         CancellationToken cancellationToken)
     {
-        var entity = await _dbContext.Skills
+        var skill = await _dbContext.Skills
             .FirstOrDefaultAsync(s => s.Id == command.Id, cancellationToken);
 
-        if (entity is null)
+        if (skill is null)
             return Result<SkillDetailDto>.Failure(
                 $"Skill con id {command.Id} no encontrado.",
                 "NOT_FOUND");
 
         // Check if already soft-deleted
-        if (entity.EliminadoEn.HasValue)
+        if (skill.EliminadoEn.HasValue)
             return Result<SkillDetailDto>.Failure(
                 $"Skill con id {command.Id} está eliminado.",
                 "NOT_FOUND");
 
-        // Create domain entity for validation
-        var skill = new Skill(entity.Nombre, entity.Categoria, entity.Descripcion);
-        skill.Actualizar(command.Nombre, command.Categoria, command.Descripcion);
+        // Check for duplicate active name (exclude self)
+        var trimmedNombre = command.Nombre.Trim();
+        var duplicateExists = await _dbContext.Skills
+            .AnyAsync(s => s.Nombre == trimmedNombre && s.Id != command.Id && s.Activo && s.EliminadoEn == null, cancellationToken);
 
-        // Update persistence entity
-        entity.Nombre = skill.Nombre;
-        entity.Categoria = skill.Categoria;
-        entity.Descripcion = skill.Descripcion;
-        entity.ModificadoEn = DateTime.UtcNow;
+        if (duplicateExists)
+        {
+            return Result<SkillDetailDto>.Failure(
+                $"Ya existe otro skill activo con el nombre '{trimmedNombre}'.",
+                "CONFLICT");
+        }
+
+        // Domain method validates and trims internally
+        skill.Actualizar(trimmedNombre, command.Categoria?.Trim(), command.Descripcion?.Trim());
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result<SkillDetailDto>.Success(new SkillDetailDto
-        {
-            Id = entity.Id,
-            Nombre = entity.Nombre,
-            Categoria = entity.Categoria,
-            Descripcion = entity.Descripcion,
-            Activo = entity.Activo ?? false,
-            CreadoEn = entity.CreadoEn,
-            ModificadoEn = entity.ModificadoEn
-        });
+        return Result<SkillDetailDto>.Success(SkillDetailDto.FromEntity(skill));
     }
 }

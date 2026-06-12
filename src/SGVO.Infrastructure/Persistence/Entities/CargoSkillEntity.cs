@@ -18,6 +18,6 @@ public class CargoSkillEntity
 
     // Navigation properties
     public virtual Cargo Cargo { get; set; } = null!;
-    public virtual SkillEntity Skill { get; set; } = null!;
+    public virtual Skill Skill { get; set; } = null!;
     public virtual UsuarioEntity? EliminadoPorNavigation { get; set; }
 }

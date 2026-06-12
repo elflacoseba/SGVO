@@ -1,7 +1,7 @@
 using SGVO.Application.Features.Skills.Commands;
+using SGVO.Domain.Entities;
 using SGVO.Infrastructure.Commands;
 using SGVO.Infrastructure.Persistence;
-using SGVO.Infrastructure.Persistence.Entities;
 using SGVO.UnitTests.Queries;
 
 namespace SGVO.UnitTests.Commands.Skills;
@@ -16,20 +16,14 @@ public class ReactivarSkillCommandHandlerTests
     {
         // Arrange
         var dbContext = InMemoryDbContextFactory.Create();
-        var entity = new SkillEntity
-        {
-            Nombre = "Python",
-            Categoria = "Técnica",
-            Activo = false,
-            CreadoEn = DateTime.UtcNow,
-            EliminadoEn = DateTime.UtcNow,
-            EliminadoPor = 1
-        };
-        dbContext.Skills.Add(entity);
+        var skill = new Skill("Python", "Técnica");
+        dbContext.Skills.Add(skill);
+        await dbContext.SaveChangesAsync();
+        skill.Eliminar(1);
         await dbContext.SaveChangesAsync();
 
         var handler = new ReactivarSkillCommandHandler(dbContext);
-        var command = new ReactivarSkillCommand(entity.Id);
+        var command = new ReactivarSkillCommand(skill.Id);
 
         // Act
         var result = await handler.Handle(command, CancellationToken.None);
@@ -45,18 +39,12 @@ public class ReactivarSkillCommandHandlerTests
     {
         // Arrange
         var dbContext = InMemoryDbContextFactory.Create();
-        var entity = new SkillEntity
-        {
-            Nombre = "Python",
-            Categoria = "Técnica",
-            Activo = true,
-            CreadoEn = DateTime.UtcNow
-        };
-        dbContext.Skills.Add(entity);
+        var skill = new Skill("Python", "Técnica");
+        dbContext.Skills.Add(skill);
         await dbContext.SaveChangesAsync();
 
         var handler = new ReactivarSkillCommandHandler(dbContext);
-        var command = new ReactivarSkillCommand(entity.Id);
+        var command = new ReactivarSkillCommand(skill.Id);
 
         // Act
         var result = await handler.Handle(command, CancellationToken.None);

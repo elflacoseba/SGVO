@@ -110,12 +110,7 @@ public class EliminarCargoCommandHandlerTests
         var dbContext = InMemoryDbContextFactory.Create();
         var cargo = new Cargo("Analista", null);
         dbContext.Cargos.Add(cargo);
-        dbContext.Skills.Add(new SkillEntity
-        {
-            Nombre = "Skill 1",
-            Activo = true,
-            CreadoEn = DateTime.UtcNow
-        });
+        dbContext.Skills.Add(new Skill("Skill 1"));
         await dbContext.SaveChangesAsync();
 
         var skillId = dbContext.Skills.First().Id;

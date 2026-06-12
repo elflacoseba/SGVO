@@ -23,25 +23,14 @@ public class GetSkillByIdQueryHandler : IQueryHandler<GetSkillByIdQuery, SkillDe
         GetSkillByIdQuery request,
         CancellationToken cancellationToken)
     {
-        var entity = await _dbContext.Skills
+        var skill = await _dbContext.Skills
             .AsNoTracking()
             .Where(s => s.Id == request.Id && s.EliminadoEn == null)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (entity is null)
+        if (skill is null)
             return Result<SkillDetailDto?>.Success(null);
 
-        var dto = new SkillDetailDto
-        {
-            Id = entity.Id,
-            Nombre = entity.Nombre,
-            Categoria = entity.Categoria,
-            Descripcion = entity.Descripcion,
-            Activo = entity.Activo ?? false,
-            CreadoEn = entity.CreadoEn,
-            ModificadoEn = entity.ModificadoEn
-        };
-
-        return Result<SkillDetailDto?>.Success(dto);
+        return Result<SkillDetailDto?>.Success(SkillDetailDto.FromEntity(skill));
     }
 }

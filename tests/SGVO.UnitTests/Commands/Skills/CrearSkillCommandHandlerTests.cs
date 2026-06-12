@@ -1,4 +1,5 @@
 using SGVO.Application.Features.Skills.Commands;
+using SGVO.Domain.Entities;
 using SGVO.Infrastructure.Commands;
 using SGVO.Infrastructure.Persistence;
 using SGVO.Infrastructure.Persistence.Entities;
@@ -54,13 +55,7 @@ public class CrearSkillCommandHandlerTests
     {
         // Arrange
         var dbContext = InMemoryDbContextFactory.Create();
-        dbContext.Skills.Add(new SkillEntity
-        {
-            Nombre = "Python",
-            Categoria = "Técnica",
-            Activo = true,
-            CreadoEn = DateTime.UtcNow
-        });
+        dbContext.Skills.Add(new Skill("Python", "Técnica"));
         await dbContext.SaveChangesAsync();
 
         var handler = new CrearSkillCommandHandler(dbContext);
@@ -72,5 +67,48 @@ public class CrearSkillCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal("CONFLICT", result.ErrorCode);
+    }
+
+    [Fact]
+    public async Task Handle_WithTrimmedWhitespace_DetectsDuplicate()
+    {
+        // Arrange
+        var dbContext = InMemoryDbContextFactory.Create();
+        dbContext.Skills.Add(new Skill("Python", "Técnica"));
+        await dbContext.SaveChangesAsync();
+
+        var handler = new CrearSkillCommandHandler(dbContext);
+        var command = new CrearSkillCommand("  Python  ", null, null);
+
+        // Act
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("CONFLICT", result.ErrorCode);
+    }
+
+    [Fact]
+    public async Task Handle_DuplicateSoftDeletedName_AllowsReuse()
+    {
+        // Arrange
+        var dbContext = InMemoryDbContextFactory.Create();
+        var skill = new Skill("Python", "Técnica");
+        dbContext.Skills.Add(skill);
+        await dbContext.SaveChangesAsync();
+
+        // Soft delete it
+        skill.Eliminar(1);
+        await dbContext.SaveChangesAsync();
+
+        var handler = new CrearSkillCommandHandler(dbContext);
+        var command = new CrearSkillCommand("Python", null, null);
+
+        // Act
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal("Python", result.Value!.Nombre);
     }
 }

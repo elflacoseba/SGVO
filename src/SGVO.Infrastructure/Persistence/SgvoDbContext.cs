@@ -25,7 +25,7 @@ public class SgvoDbContext : DbContext
     public DbSet<PostulanteEntity> Postulantes { get; set; }
     public DbSet<PuestoEntity> Puestos { get; set; }
     public DbSet<RoleEntity> Roles { get; set; }
-    public DbSet<SkillEntity> Skills { get; set; }
+    public DbSet<Skill> Skills { get; set; }
     public DbSet<TipoUnidadOrganizativaEntity> TiposUnidadOrganizativa { get; set; }
     public DbSet<UnidadesOrganizativaEntity> UnidadesOrganizativas { get; set; }
     public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
