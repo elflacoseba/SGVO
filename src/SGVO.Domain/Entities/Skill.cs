@@ -3,7 +3,7 @@ namespace SGVO.Domain.Entities;
 /// <summary>
 /// Representa una habilidad o competencia.
 /// </summary>
-public class Skill
+public class Skill : IEntity
 {
     public long Id { get; private set; }
     public string Nombre { get; private set; } = null!;
@@ -11,6 +11,7 @@ public class Skill
     public string? Descripcion { get; private set; }
     public bool Activo { get; private set; }
     public DateTime CreadoEn { get; private set; }
+    public DateTime? ModificadoEn { get; private set; }
     public DateTime? EliminadoEn { get; private set; }
     public long? EliminadoPor { get; private set; }
 
@@ -61,6 +62,7 @@ public class Skill
         Nombre = nombre.Trim();
         Categoria = categoria?.Trim();
         Descripcion = descripcion?.Trim();
+        ModificadoEn = DateTime.UtcNow;
     }
 
     /// <summary>
@@ -71,6 +73,7 @@ public class Skill
         EliminadoEn = DateTime.UtcNow;
         EliminadoPor = eliminadoPor;
         Activo = false;
+        ModificadoEn = DateTime.UtcNow;
     }
 
     /// <summary>
@@ -81,5 +84,6 @@ public class Skill
         EliminadoEn = null;
         EliminadoPor = null;
         Activo = true;
+        ModificadoEn = DateTime.UtcNow;
     }
 }

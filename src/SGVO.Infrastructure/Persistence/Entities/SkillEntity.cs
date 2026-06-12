@@ -13,6 +13,7 @@ public class SkillEntity
     public string? Descripcion { get; set; }
     public bool? Activo { get; set; }
     public DateTime CreadoEn { get; set; }
+    public DateTime? ModificadoEn { get; set; }
     public DateTime? EliminadoEn { get; set; }
     public long? EliminadoPor { get; set; }
 
