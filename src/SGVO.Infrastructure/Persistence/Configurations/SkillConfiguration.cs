@@ -1,15 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SGVO.Domain.Entities;
 using SGVO.Infrastructure.Persistence.Entities;
 
 namespace SGVO.Infrastructure.Persistence.Configurations;
 
 /// <summary>
-/// Configuración Fluent API para SkillEntity.
+/// Configuración Fluent API para Skill domain entity.
 /// </summary>
-public class SkillConfiguration : IEntityTypeConfiguration<SkillEntity>
+public class SkillConfiguration : IEntityTypeConfiguration<Skill>
 {
-    public void Configure(EntityTypeBuilder<SkillEntity> builder)
+    public void Configure(EntityTypeBuilder<Skill> builder)
     {
         builder.ToTable("Skills");
 
@@ -27,28 +28,22 @@ public class SkillConfiguration : IEntityTypeConfiguration<SkillEntity>
             .HasMaxLength(500);
 
         builder.Property(e => e.Activo)
+            .IsRequired()
             .HasDefaultValue(true);
 
         builder.Property(e => e.CreadoEn)
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        // Relationships
-        builder.HasOne(e => e.EliminadoPorNavigation)
+        builder.Property(e => e.ModificadoEn)
+            .ValueGeneratedOnAddOrUpdate();
+
+        // Relationships — Skill has no navigation collections, so we configure
+        // the inverse side from the other entity configurations.
+        // FK for EliminadoPor is configured here since Skill owns the FK property.
+        builder.HasOne<UsuarioEntity>()
             .WithMany(u => u.Skills)
             .HasForeignKey(e => e.EliminadoPor)
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("FK_Skills_EliminadoPor");
-
-        builder.HasMany(e => e.CargoSkills)
-            .WithOne(cs => cs.Skill)
-            .HasForeignKey(cs => cs.SkillId)
-            .OnDelete(DeleteBehavior.ClientSetNull)
-            .HasConstraintName("FK_CargoSkills_Skill");
-
-        builder.HasMany(e => e.PersonaSkills)
-            .WithOne(ps => ps.Skill)
-            .HasForeignKey(ps => ps.SkillId)
-            .OnDelete(DeleteBehavior.ClientSetNull)
-            .HasConstraintName("FK_PersonaSkills_Skill");
     }
 }

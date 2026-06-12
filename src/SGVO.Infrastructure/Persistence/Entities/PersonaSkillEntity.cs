@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using SGVO.Domain.Entities;
 
 namespace SGVO.Infrastructure.Persistence.Entities;
 
@@ -17,6 +18,6 @@ public class PersonaSkillEntity
 
     // Navigation properties
     public virtual PersonaEntity Persona { get; set; } = null!;
-    public virtual SkillEntity Skill { get; set; } = null!;
+    public virtual Skill Skill { get; set; } = null!;
     public virtual UsuarioEntity? EliminadoPorNavigation { get; set; }
 }

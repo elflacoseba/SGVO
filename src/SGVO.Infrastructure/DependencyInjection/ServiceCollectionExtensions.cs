@@ -11,6 +11,7 @@ using SGVO.Application.Features.Cargos.Commands;
 using SGVO.Application.Features.Cargos.Queries;
 using SGVO.Domain.Entities;
 using SGVO.Application.Features.Postulantes.Queries;
+using SGVO.Application.Features.Skills.Commands;
 using SGVO.Application.Features.Skills.Queries;
 using SGVO.Application.Features.TiposUnidadOrganizativa.Commands;
 using SGVO.Application.Features.TiposUnidadOrganizativa.Dtos;
@@ -59,6 +60,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICommandHandler<ReactivarCargoCommand, CargoDetailDto>, ReactivarCargoCommandHandler>();
         services.AddScoped<IQueryHandler<GetAllPostulantesQuery, PagedResult<PostulanteDto>>, GetAllPostulantesQueryHandler>();
         services.AddScoped<IQueryHandler<GetAllSkillsQuery, PagedResult<SkillDto>>, GetAllSkillsQueryHandler>();
+        services.AddScoped<IQueryHandler<GetSkillByIdQuery, SkillDetailDto?>, GetSkillByIdQueryHandler>();
+
+        // Skill command handlers
+        services.AddScoped<ICommandHandler<CrearSkillCommand, SkillDetailDto>, CrearSkillCommandHandler>();
+        services.AddScoped<ICommandHandler<ActualizarSkillCommand, SkillDetailDto>, ActualizarSkillCommandHandler>();
+        services.AddScoped<ICommandHandler<EliminarSkillCommand, Unit>, EliminarSkillCommandHandler>();
+        services.AddScoped<ICommandHandler<ReactivarSkillCommand, SkillDetailDto>, ReactivarSkillCommandHandler>();
         services.AddScoped<IQueryHandler<GetCurrentUserQuery, UserDto?>, GetCurrentUserQueryHandler>();
 
         // UnidadesOrganizativas query handlers

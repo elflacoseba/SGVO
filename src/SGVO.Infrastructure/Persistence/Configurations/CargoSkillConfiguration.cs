@@ -31,7 +31,7 @@ public class CargoSkillConfiguration : IEntityTypeConfiguration<CargoSkillEntity
             .HasConstraintName("FK_CargoSkills_Cargo");
 
         builder.HasOne(e => e.Skill)
-            .WithMany(s => s.CargoSkills)
+            .WithMany()
             .HasForeignKey(e => e.SkillId)
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("FK_CargoSkills_Skill");

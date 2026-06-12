@@ -1,7 +1,8 @@
 using SGVO.Application.Common;
 using SGVO.Application.Features.Skills.Queries;
-using SGVO.Infrastructure.Persistence.Entities;
+using SGVO.Domain.Entities;
 using SGVO.Infrastructure.Queries;
+using SGVO.UnitTests.Queries;
 
 namespace SGVO.UnitTests.Queries;
 
@@ -16,8 +17,8 @@ public class GetAllSkillsQueryHandlerTests
         // Arrange
         var dbContext = InMemoryDbContextFactory.Create();
         dbContext.Skills.AddRange(
-            new SkillEntity { Id = 1, Nombre = "Skill 1", Categoria = "Tech", Activo = true, CreadoEn = DateTime.UtcNow },
-            new SkillEntity { Id = 2, Nombre = "Skill 2", Categoria = "Soft", Activo = true, CreadoEn = DateTime.UtcNow }
+            new Skill("Skill 1", "Tech"),
+            new Skill("Skill 2", "Soft")
         );
         await dbContext.SaveChangesAsync();
 
@@ -39,10 +40,11 @@ public class GetAllSkillsQueryHandlerTests
     {
         // Arrange
         var dbContext = InMemoryDbContextFactory.Create();
-        dbContext.Skills.AddRange(
-            new SkillEntity { Id = 1, Nombre = "Activo", Activo = true, CreadoEn = DateTime.UtcNow },
-            new SkillEntity { Id = 2, Nombre = "Eliminado", Activo = false, EliminadoEn = DateTime.UtcNow, EliminadoPor = 1, CreadoEn = DateTime.UtcNow }
-        );
+        var activo = new Skill("Activo");
+        var eliminado = new Skill("Eliminado");
+        dbContext.Skills.AddRange(activo, eliminado);
+        await dbContext.SaveChangesAsync();
+        eliminado.Eliminar(1);
         await dbContext.SaveChangesAsync();
 
         var handler = new GetAllSkillsQueryHandler(dbContext);

@@ -108,8 +108,6 @@ Icon
 .opencode/cache/
 .opencode/tmp/
 .opencode/logs/
-openspec/
-.atl/
 
 # Engram
 .engram/cache/
